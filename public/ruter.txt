@@ -1,0 +1,422 @@
+                                                                                           
+
+1            Vangen skule, bading                                                                                                
+2            Vangen skule diverse                                                                                                
+3            Fisher                                                                                                              
+4            Issak                                                                                                               
+5            Ayman Hassan                                                                                                        
+6            Tage Haugo                                                                                                          
+7            Hyab Tesfaslasse                                                                                                    
+8            Movegen                                                                                                             
+9            Hydle                                                                                                               
+10           Tuva Øytese                                                                                                         
+11           Gjernes sk.-Bassenget                                                                                               
+12           Bading Gjernes skule/Hagahaug                                                                                       
+13           Gjernes skule                                                                                                       
+14           Vikjavegen 444-Gjernes sk.                                                                                          
+15           Bordalsvegen 194 klient 1081                                                                                        
+16           Isabella                                                                                                            
+17           Franciszek Babut                                                                                                    
+18           Linnea Hagen                                                                                                        
+21           Kløve Barnehage                                                                                                     
+25           Reime-Palmafossen                                                                                                   
+26           Olav Opkvitne                                                                                                       
+27           Voss Barnehage                                                                                                      
+29           Liavegen 160                                                                                                        
+30           Theo Kolve                                                                                                          
+31           Gjeraldstveit                                                                                                       
+32           Strandavegen 82                                                                                                     
+33           Imre Larsen                                                                                                         
+34           Auro - Vikje                                                                                                        
+35           Skutlesvegnen /Hole                                                                                                 
+36           Wuttedal; Vindal og Hagahaugen                                                                                      
+37           Lillås                                                                                                              
+38           Daniel Vestreim                                                                                                     
+39           Emrik Olai Larsen                                                                                                   
+40           Ingeborg, Eliana                                                                                                    
+41           Flatlansmo Camping                                                                                                  
+42           Tiril Slettemark                                                                                                    
+43           Emil Wuttudal                                                                                                       
+44           Thomas Vesterheim                                                                                                   
+50           Hosås--Seim                                                                                                         
+51           Bulken skule                                                                                                        
+52           Petra Bolstad                                                                                                       
+53           jorene-Bulken skule m/retur                                                                                         
+54           Dyrvedalen                                                                                                          
+55           Hernesvegen 178                                                                                                     
+56           Rannveig Istad                                                                                                      
+57           Bulken skule bading                                                                                                 
+58           Bulken skule diverse                                                                                                
+59           Madelen Midthun                                                                                                     
+60           Bjørgum skule diverse                                                                                               
+61           Bjørgum skule                                                                                                       
+62           Jørdre-Bulkavegen                                                                                                   
+63           Bulko                                                                                                               
+64           Strandavegen 409                                                                                                    
+65           Vinterskyss Istad                                                                                                   
+66           Istadosen 31 Istadvegen 19                                                                                          
+67           J.S                                                                                                                 
+68           Anna  Olivia, Johanna ,                                                                                            
+69           Bjørgum -Nedre Fenne                                                                                                
+70           Bjørgum skule bading                                                                                                
+71           Hovland                                                                                                         
+90           Tomine                                                                                                          
+91           Almeland                                                                                                     
+92           Ashti Armed                                                                                                     
+93           Holbygda/GJerald                                                                                                
+94           Strandavegen - Saue                                                                                             
+95           Dexter Almeland                                                                                                 
+96           Sivlevegen 80                                                                                                   
+97           Kvasshovden                                                                                                     
+98           Turner                                                                                                          
+99          Skulestad skule                                                                                                 
+100         Bading Skulestad skule                                                                                          
+101         Kvite rekvisisjoner                                                                                             
+102         Komm.Fysioterapaut                                                                                              
+103         Helseavd.                                                                                                       
+104         Integrering og Vaksenopplæring                                                                                  
+105         LEGEKJØRING                                                                                                     
+110         Julien                                                                                                          
+111         Flykningtenesta, Avd Oppvekst                                                                                   
+112         SOSIALKONTORET,Diverse                                                                                          
+114         Voss Herad  Diverse                                                                                             
+115         BARNEVERNTJENESTEN                                                                                              
+116         Kulturhuset                                                                                                     
+118         Pleie og omsorg                                                                                                 
+119         Ungdomsskulen                                                                                                   
+120         Vaksenopplæring                                                                                                 
+124         Torvald Jæger Nordanger                                                                                         
+125         Ungdomskulen-Voss Videregående                                                                                  
+126         Nyhagen Aktivitetssenter                                                                                        
+131         Udlabua                                                                                                         
+132         Vetleflaten omsorgsenter                                                                                        
+133         Granvin sjukeheim                                                                                               
+134         Anne Lene Andersen                                                                                              
+135         Vossestrand Omsorgtun                                                                                           
+136         Skulestadtunet Bufelleskap                                                                                      
+138         Arne Dugstad                                                                                                    
+141         Ole Bull Akademiet                                                                                              
+142         FSV,Div.kjøring                                                                                                 
+143         Labratoriet Voss Sjukehus                                                                                       
+144         Voss Sjukehus-Med. avd                                                                                          
+145         Voss Sjukehus-Haukeland medi.                                                                                   
+146         Diverse kjøring                                                                                                 
+151         VIKING REDNINGSTJENESTE AS                                                                                      
+153         NSB Fellestjenester Rekneskap                                                                                   
+155         Vygruppen                                                                                                       
+159         FALKEN AS                                                                                                       
+160         VOSS SJUKEHEIM,Arbeidsstova                                                                                     
+161         Hagahaugen Rehab/Aldersheim                                                                                     
+162         Voss Sjukeheim 2.etasje                                                                                         
+163         Voss Sjukeheim 3 etasje                                                                                         
+164         Voss Sjukeheim 4 etasje                                                                                         
+165         Rullestol Gjerdebu/Lekve                                                                                        
+166         Nyhagen/Vetleflaten                                                                                             
+167         Granvin Sjukeheim                                                                                               
+179         Martine Vik                                                                                                     
+180         Voss Gymnas                                                                                                     
+181         Aurora Sander-Fjeld                                                                                             
+182         Filip Oppheim                                                                                                   
+183         Farestveit                                                                                                      
+184         Arnetveit Ingvild                                                                                               
+185         Håkon Jordalen                                                                                                  
+186         Julien                                                                                                          
+187         Leon Hagen                                                                                               
+188         Jacob Fisher                                                                                             
+189         Bartosz Parafiniuks                                                                                      
+190         Aisha & Hafsa                                                                                            
+191         Hilda og Mari                                                                                            
+192         Kåre Kvarme                                                                                              
+193         Oskar Berland                                                                                            
+195         Shafi                                                                                                    
+196         Knut Lydvo                                                                                               
+197         Jorene                                                                                                   
+198         Oliver Kløve                                                                                             
+199         Anders Rode                                                                                              
+200         Diana Dakajeva                                                                                           
+201         Javand                                                                                                   
+203         Amina                                                                                                    
+205         Aisha og Hafsa                                                                                           
+207         Bastionen                                                                                                
+208         Håvard Gunnlaugson                                                                                       
+209         Nina Alexandra                                                                                           
+210         Nyresvegen 30                                                                                            
+213         Gjerdebu                                                                                                 
+216         Diana                                                                                                    
+217         Håvard Gunnlaugson                                                                                       
+218         Nina Alexandra                                                                                           
+219         Evy Hosås                                                                                                
+220         Javan Nabil Khalil                                                                                       
+221         Mia Haukås                                                                                               
+222         Vesland Fylkeskommune                                                                                    
+223         Vebjørn Tolås                                                                                            
+224         Brayan                                                                                                   
+225         Amanie                                                                                                   
+226         Tuva Nygård                                                                                              
+227         Ullensvang /Kinsarvik                                                                                    
+228         Helgaseth                                                                                                
+229         Salam                                                                                                    
+230         Magne Almeland                                                                                           
+231         Tvildemoen Barnehage                                                                                     
+233         Vestland Fylkeskommune                                                                                   
+250         Saba Yosief Gebregiorg                                                                                   
+260         Silje Haug                                                                                               
+298         Hassan                                                                                                   
+300         FLEISCHER HOTELL,Div.kjøring                                                                             
+303         Voss Vind Drift AS                                                                                       
+304         Discover Norge                                                                                           
+305         Glacier Tours                                                                                            
+307         PARK HOTELL VOSSEVANGEN                                                                                  
+308         Norway Aktive                                                                                            
+309         Kh-Ekspressen                                                                                            
+310         Fotballklubben Voss                                                                                      
+312         BRAATENS BAGASJESERVICE                                                                                  
+315         Hagahaugen, Div.køyring                                                                                  
+317         Voss Resort Hangurstoppen AS                                                                             
+318         Voss Gondol                                                                                              
+319         Voss Resort Bavallstunet                                                                                 
+320         Vestnorsk Kulturakademi                                                                                  
+321         SOGN BILLAG,Div.kjøring                                                                                  
+322         BJØLVEFOSSEN,Div.kjøring                                                                                 
+323         Veidekke Entreprenør                                                                                     
+324         Anita Grevle                                                                                             
+325         Hardanger Bakeri                                                                                         
+326         Malin Petterson                                                                                          
+329         Lene Vivelid                                                                                             
+330         Scandic Voss                                                                                                 
+334         Elisabeth                                                                                                    
+335         Bergen Audio                                                                                                 
+340         Voss Park.selsk.køyring av p.v                                                                               
+350         Skulekjøring Granvin                                                                                         
+351         Skule kjøring Granvin                                                                                        
+355         Elvira Liland                                                                                                
+357         TV 2, NYHETENE                                                                                               
+360         Fritidsaktiviteter Voss Herad                                                                                
+399         Gavekort                                                                                                     
+400         VOSS TAXI                                                                                                    
+401         Vossevangen Turbil                                                                                           
+402         Stiftelsen Sosialbygget                                                                                      
+403         Gavekort Johanna Taule                                                                                       
+404         Vipps                                                                                                        
+405         Voss Transport Service                                                                                       
+406         Voss Turbil                                                                                                  
+407         Shuttelbuss                                                                                                  
+408         Voss og Fjordane Guideservice                                                                                
+409         Voss Sjukeheim Dagavd.                                                                                       
+410         Voss Sjukeheim Dagvavdeling                                                                                  
+411         Gåvekort Mona Bratland                                                                                       
+412         Bjørgåsvegen/ Bordalsvg/Nyre                                                                                 
+415         Voss Røde Kors                                                                                               
+416         Nabobeina                                                                                                    
+418         Ungdomsskulen Skigruppa                                                                                      
+419         Ungdomskulen                                                                                                 
+420         Vetle Milson, bading                                                                                         
+421         Helleve                                                                                                      
+422         Bading Hagahaugen                                                                                            
+424         Nicolas Jones/ Bading                                                                                        
+425         Gullfjordingen Skule                                                                                         
+426         Nicholas Jones                                                                                               
+427         Nicolas Jones                                                                                                
+428         Knut F.Lydvo                                                                                                 
+430         Markus og Lukas                                                                                              
+431         Knut F. Lydvo                                                                                                
+440         Miram Omar Alsheik                                                                                           
+444         TRYGDEKØYRING - FYLKE                                                                                        
+445         Egenandel Sjuketransport                                                                                     
+459         Evanger-Vossabadet                                                                                           
+460         Petra og Ola Bolstad                                                                                         
+461         Tomine Tesdal                                                                                                
+462         Hedda og Ingvar Stavrum                                                                                      
+463         Andre Bolstad,Oskar Tyssen                                                                                   
+464         Pettersen                                                                                                    
+465         Ada Kristine Utsola                                                                                          
+466         Evanger skule diverse                                                                                        
+467         Nikolai Bøe Soltveit                                                                                         
+471         Hjørnevik                                                                                                    
+490         Midthun                                                                                                      
+491         Dolve                                                                                                        
+492         Slettemark                                                                                                   
+494         Midthun Rekve                                                                                                
+495         Nadlane Rekve                                                                                                
+496         Thor Dregelid                                                                                                
+497         Synva Bidne                                                                                                  
+500         AURLAND KOMMUNE                                                                                              
+501         tide buss                                                                                                    
+505         Yasootha                                                                                                     
+510         Espe Ekstra tur                                                                                              
+514         Moise Grace                                                                                                  
+515         Tuva Øystese                                                                                                   
+520         Espe, Ekstra tur Juni/Salam                                                                                    
+530         Ines Ake                                                                                                       
+531         Synva Ringheim Horvik                                                                                          
+532         Kseniia Morhunova                                                                                              
+533         Rykkesvgn 150 Tomine Lidsheim                                                                                  
+534         Adrian Skjerven Spook                                                                                          
+541         Jori Flisram Tveiten                                                                                           
+542         Palmafossen skule rekvisisjon                                                                                  
+548         Oda Flotve                                                                                                     
+550         Bidne                                                                                                          
+552         Amanda Flage                                                                                                   
+560         Tillegg Strandavegen 405                                                                                       
+561         Hedda Horvei                                                                                                   
+570         Imre Larsen                                                                                                    
+580         Hanna Hop                                                                                                      
+585         Lachlan  Smith                                                                                                 
+586         Nils August Skeie Akselberg                                                                                    
+587         Edel og Jan Sten                                                                                               
+590         Aisha og Hafsa                                                                                                 
+591         Iris Kovac                                                                                                     
+593         Kvarmo/Løkjavegen                                                                                              
+594         Grevlesvegen 14                                                                                                
+595         Synva Bidne                                                                                                    
+600         Turist køyring                                                                                                 
+601         Oda Flotve                                                                                                     
+602         Amelia Sumskaite                                                                                               
+603         Kristin Grace Mateo                                                                                            
+604         Iver Skiple Mæland                                                                                             
+605         Annelin Rong Soldal                                                                                            
+606         Vemund Haukenes                                                                                                
+607         Ronja Wiese Nielsen                                                                                            
+608         Marius Thorsen                                                                                                 
+609         Vilde Røynesdal                                                                                                
+610         Sam Nubdal-Havro                                                                                               
+611          Brunvær Aarsand                                                                                               
+612         Iver August Horvei Andersen                                                                                    
+613         Opelandsvegen176                                                                                               
+614         Johan Guttormsen                                                                                               
+615         Bjørn Eliassen                                                                                                 
+616         Brita Nestås Tillung                                                                                           
+617         Håvard Gullaugson/Rullestol                                                                                    
+618         Emil Gullbekkhei                                                                                               
+619         Amanda Linstad Tillung                                                                                         
+620         Villa Berge                                                                                                    
+621         Nicholas Carter Jones                                                                                          
+622         Nikolas Jones tillegg rullesto                                                                                 
+623         Nickolas Jones                                                                                                 
+625         Malin Steinstø Hilland                                                                                         
+626         Hudeyfa A.Abdi                                                                                                 
+630         Oline Heggernes                                                                                                
+631         Ivar Soldal                                                                                                    
+635         Daniel Vestreim                                                                                                
+640         Adrian Opheim Almeland                                                                                         
+642         Palmafoss skule/kulturvandring                                                                                 
+643         Emil Wuttudal                                                                                                  
+650         Backroads                                                                                                      
+651         Helgaseth/Hildestveit                                                                                          
+652         Nygård                                                                                                         
+653         Irene Aarhus                                                                                                   
+655         Ingebjørg Farestveit                                                                                           
+659         Marius og Madelen Midthun                                                                                      
+662         Hedda og Ingvard Stavrum                                                                                      
+679         Elev Evanger til G.fjord./Voss                                                                                
+680         Horvei                                                                                                        
+681         Nora Karin Bertelsen                                                                                          
+685         Sigrid Helgaset                                                                                               
+690         Thor Dregelid                                                                                                 
+691         Jordalen,Bulken skule                                                                                         
+692         Tobias Tinkler                                                                                                
+693         Tilje og Heidi Hagatun Rong                                                                                   
+696         Mariell Fyllingslid Appeltun                                                                                  
+697         Lisa Hisdal                                                                                                   
+700         Måned 11 2024/2025                                                                                            
+701         Kreditnota                                                                                                    
+703         Raundalen mnd 11 2024/25                                                                                      
+704         Amina                                                                                                         
+705         Rest mnd 1 2024/2025                                                                                          
+706         Rest mnd 1                                                                                                    
+707         Tor Espen Hårklau                                                                                             
+710         Julien Elia                                                                                                   
+715         Leon Hagen                                                                                                    
+719         Birk Ravn Mugås                                                                                               
+720         Bartoz Parafinkus                                                                                             
+721         Helleve                                                                                                       
+723         Amina  Retur frå skulen                                                                                       
+725         Endre Oma                                                                                                     
+730         Andrea Gjetle                                                                                                 
+734         Bonsaksen Hole                                                                                                
+740         Adrian O.Almeland Vinterskyss                                                                                 
+741         Ludvik Bø                                                                                                     
+750         Diverse kjøring for buss                                                                                      
+752         Amanda Aarsand Flage                                                                                          
+753         Martine                                                                                                       
+754         Dyrvedalen Vinter skyss                                                                                       
+755         Honvesvegen252                                                                                                
+780         Mario Durcik                                                                                                  
+781         Ella Gjeraker                                                                                                 
+782         Victoria Furnes                                                                                               
+783         Ingrid Fareth Aas                                                                                             
+784         Peter Meusburger                                                                                              
+785         Sigrid Helgaseth                                                                                              
+786           Michael Øyjordsbakken                                                                                       
+787         FT-20230606-2140121                                                                                           
+788         Rogne                                                                                                         
+789         Einar Gjerald                                                                                                 
+790         Kassandra                                                                                                     
+792         Skjervheimsvegen 66                                                                                           
+793         Kahled Masen Ali                                                                                              
+794         Flotve                                                                                                        
+795         Håkon Johan Gjerde                                                                                            
+796         Ingeborg Hoff                                                                                                 
+797         Synnva og Håvard Knapstad                                                                                     
+798         Kassandra                                                                                                     
+799         Nora Karin Bertelsen                                                                                          
+800         Opelandsvegn 234                                                                                              
+802         Ekstra Almeland                                                                                               
+803         Jacob Fisher                                                                                                  
+804         Nattbuss                                                                                                      
+805         Ayman SFO                                                                                                     
+806         Tide Horisont AS                                                                                              
+807         Hijab ,, Ameja SFO                                                                                            
+809         Vinterskyss Istadvegen                                                                                        
+810         vivås                                                                                                         
+811         Oskar Berland                                                                                                    
+812          Iver Meland                                                                                                     
+817          Dyrvedalen, Vinterskyss                                                                                         
+825         Vetle Milson                                                                                                     
+827          Nicolas Jones                                                                                                   
+829         Skulestad Barnehage                                                                                              
+830         Skulestad Barnehage                                                                                              
+831         Tueteigen Barnehage                                                                                              
+832          Bolstad Barnehage                                                                                               
+833          Bordalen barnehage                                                                                              
+834          Hagahaugen barnehage                                                                                            
+835          Rogne Barnehage                                                                                                 
+836          Evanger Barnehage                                                                                               
+837          Regnbogen barnehage                                                                                             
+838          Bjørgamarki Barnehage                                                                                           
+840         Arne Gilbakken                                                                                                   
+841          Bulken Skule/Dyrvedalsveg 307                                                                                   
+844          Isack SFO                                                                                                       
+850          Kreditnota                                                                                                      
+853          Bente Vines                                                                                                     
+854         Voss Idrettslag                                                                                                  
+855         Alexandra Felicia Oninaku                                                                                        
+890         Torvald Nordanger                                                                                                
+892          Emil Ekerhovd Klette                                                                                            
+893          Mattis Åhlund Bøe                                                                                               
+895         Alexander Brian Jones                                                                                            
+900         Voss Videregående skule                                                                                          
+901          FT-20250530-4589337                                                                                             
+902          FT-20250701-4755278                                                                                             
+903          FT-20250124-3987937                                                                                             
+904          FT-20250204-4030526                                                                                             
+905          FT-20250701-4754752                                                                                             
+906          Kevin Lochhead                                                                                                  
+910         Sana Mottak                                                                                                      
+920         ON TREK                                                                                                          
+955         Velkommen Norge/Bastiaan                                                                                         
+960          Backroads                                                                                                       
+970         Voss -Myrkdalen 26-28.07.2025                                                                                    
+992          Ea Elvine Solstad, August                                                                                       
+993         Asim Alsaawi                                                                                                     
+999         TRYGDEKJØRING lokalt                                                                                             
+1000         RTV RST lokalt                                                                                                  
+1001         RTV Storbil lokalt                                                                                              
+1002         RTV RST fylke                                                                                                   
+1003         RTV Storbil fylke                                                                                               
+1009         RTV liten bil lokalt                                                                                            
+1010         RTV liten bil lokalt                                                                                            
+1011        TRYGDEKØYRING - FYLKE                                                                                            
+7865        Sanna Lidsheim                                                                                                   
+8462         Hedda Stavrum, August                                                                                           
+18021       Vy APP                                                                                                           

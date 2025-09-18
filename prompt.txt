@@ -1,0 +1,42 @@
+﻿1.  Siden skal ha Digital Blåbok oppe til venstre, med underteksten, Alle raude felt MÅ fyllast ut.
+2. Det skal være en Nullstill knapp oppe til høyre, som nullstiller alle feltene, det kan gjerne være en ren refresh knapp, dersom det nullstiller feltene også. 
+3. Det skal være en knapp for  Lyst og Mørkt tema, helt til høyre på toppen.
+4. Så skal siden deles inn i seksjoner. 
+5. Alle seksjonene må kunne snakke sammen, da data fra ulike seksjoner skal brukest i andre seksjoner samt brukes for å generete pdf filer.
+6. Det må være en global css der vi kan endre farger, skrifter, rammer og annet, uten å redigere hver fil.
+7. Seksjonene må ha en egen fil hver for å slippe å lete gjennom masse kode i en fil.
+8. Seksjonene skal ha sort ramme med avrunda hjørner, motsatt i dark mode.
+9. Seksjon 1 skal hete Løyver:, den skal inneholde en dropdown meny, der man kan velge ett eller flere løyver fra en liste som heter biler.txt og ligger i public mappen.
+10. Når man har valgt ett løyve, skal løyvet listes på neste linje, med feltene ID: og Navn:
+ID: feltet kan være 6 tegn langt, og Navn: felten kan være 35 tegn langt.
+Dersom man velger flere enn ett løyve, skal de listes på en og en linje nedover, med ID og Navn bak.
+11. Når man skriver inn ID eller Navn skal det hentes fra filen sjoff.txt som er i formatet nummer      navn. Skriver man inn ID skal navnet hentes fra filen og settes inn i Navn feltet, samme dersom man skriver inn Navn, så skal ID hentest. Navn skal formaterest til stor forbokstav i hvert navn og små i resten av navnet, så OLA NORD skal bli Ola Nord.
+12. Disse dataene må bli lagret en plass for de skal brukest i flere seksjoner senere.
+13. Neste seksjon skal hete Dat og Tid: der skal man på en linje ha først Dato: med felt som er langt nok til å inneholde dd/mm/yyyy og det skal også formateres på denne måten, feltet skal også ha en kalenderknapp der man kan velge dato. Dersom man ikke velger dato, skal fletet inneholde dagens dato.
+14. Bak dato feltet skal vi ha 2 felt det første skal hete Start: det andre Slutt: og det skal være store nok til at hh:mm har plass, de skal formateres som 24 timers klokke, uten sekund, de skal formaterest også slik at dersom man skriver 1300 skal det bli 13:00
+15. Neste seksjon skal hete Turinformasjon: og inneholde følgende:
+   1. På linje 1 skal det være ett felt Bookingnummer: som skal være ca 8 tegn langt. 
+   2. På linje 2 skal det stå Rutenummer: 5 tegn langt, og Kunde: 40 tegn langt.
+Rutenumme og Kunde skal hentes fra filen ruter.txt som er formatert som 
+rute     kunde og ligger i mappa public. Slik at dersom man skriver inn feks 308 i rutenummer feltet så skal vi slå opp og få Norway Aktive i kunde feltet, her skal kundefeltet også formaterest slik at ord får stor forbokstav, resten små, så NORWAY AKTIVE skal bli Norway Aktive. Dersom man skriver Norway Aktive i kunde, skal rutenummer visest i Rutenummer feltet. 
+c.        På linje 3 skal det være 2 felt, For: og Ved: begge skal ha en lengde på 40 tegn
+d. På linje 4 skal det være 2 felt, Frå: og Til: begge disse skal være 40 tegn lange.
+e. På linje 5 skal det stå ett felt, Referanse: som skal være 30 tegn langt.
+f. På linje 6 skal det stå Merknad, det skal være en tekstboks på 3 linjer, 30 tegn bred.
+16. Neste seksjon skal hete Kostnader: den skal inneholde en kolonne med felt nedover med Tur 1 som overskrift, og et felt under som heter Kvitteringsnummer, der man skal skrive inn nummeret på kvitteringen 6 tegn langt. Under der skal det komme felt med lengde på 8 tegn hvert, hvert felt skal ha NOK bak seg 
+   1. På linje en skal det være feltet Turpris:
+   2. På linje 2 skal det være feltet Venting:
+   3. På linje 3 skal det være feltet Bompeng:
+   4. På linje 4 skal det være feltet Fergepeng:
+   5. På linje 5 skal det være feltet Ekstra:
+   6. På linje 6 skal det være feltet Eigenandel:
+   7. På linje 7 i tykkere skrift, skal det være feltet Totalpris: der feltet skal summeres av Turpris + Venting + Bompeng + Fergepeng + Ekstra - Eigenandel.
+   8. På linje 8 skal det være feltet Herav MVA, der innholdet skal være (Totalpris / (Totalpris/1.12))
+17. Vi må ha en knapp øverst til høyre i denne seksjonen som heter Legg til, og en som heter Fjern Alt.
+18. Når man trykker Legg til, skal en ny kolonne med feltet Kvitteringsnummer, deretter feltene fra a til h komme til høyre for denkolonnen  vi allerede har. Her også alle felt med NOK bak seg. Over hver kolonne må vi ha overskriften Tur 1, Tur 2, Tur 3 osv, dersom det er valgt mer enn 1 løyve i seksjonen Løyver, må det legges til en dropdown under Tur 1 2 3 osv, der man kan velge ett av løyvene som er satt i Løyver seksjonen. 
+19. Når det kun er 1 løyve valgt i løyver seksjonen, skal det kun stå Tur 1 2 3 osv.
+20. Når man trykker Fjern alt, skal alle kolonnene utenom den første fjernes, og første kolonnen skal tømmes for verdier i feltene
+21. Under disse kolonnen skal vi ha en strek og under den skal Feltene Total Sum: og under der Total MVA 12% stå, der vi summerer alle totalpris feltene, og alle herav mva felten.
+22. Neste seksjon skal hete Vedlegg, der skal vi ha en knapp for Legg til fil: Der kan kan legge til filer som skal være med i pdf filen som skal genererest, valgte filer skal legges på linje nedover, med en x bak for å fjerne en og en dersom man har lagt til noe man vil fjerne. Disse vedleggene skal legges da i pdf filen etterhvert, slik at dersom man skriver ut pdf så kommer alle vedleggene med på egne sider.
+23. Nederst på siden må vi ha noen knapper. VisPDF, Lagre PDF, Skriv Ut PDF og Send PDF. Disse skal ikke være aktive, før visse kriterier i resten av siden er satt. 
+24. Disse feltene gjennom hele siden skal være røde, altså rød ramme, under løyve seksjonen: Løyve, ID, Navn. Under dato tid seksjonen: Dato, Under turinfo seksjonen: Kunde, Frå, Til. Under kostnader seksjonen: Kvitteringsnummer, Turpris, Løyve.
