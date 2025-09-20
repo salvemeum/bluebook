@@ -1,197 +1,131 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+// src/components/DateTimeSection.tsx
+import React from "react";
+
+interface KostRad {
+  dato?: string;
+  starttid?: string;
+  slutttid?: string;
+  turNr?: number;
+  loyve?: string;
+}
+
+interface LoyveInfo {
+  loyve: string;
+  sjoforId: string;
+  sjoforNavn: string;
+}
 
 interface Props {
-  formData: { [k: string]: any };
-  setFormData: (data: any) => void;
+  kostnader?: KostRad[];
+  setKostnader: (k: KostRad[]) => void;
+  loyver?: LoyveInfo[];
 }
 
-/* ===== Helpers ===== */
-function pad2(n: number) {
-  return String(n).padStart(2, "0");
-}
-function todayISO() {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-}
-function isoToDisplay(iso?: string): string {
-  if (!iso) return "";
-  const [y, m, d] = iso.split("-");
-  if (!y || !m || !d) return "";
-  return `${d}/${m}/${y}`; // dd/mm/yyyy
-}
-function displayToISO(display: string): string | null {
-  const m = display.trim().match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
-  if (!m) return null;
-  let dd = parseInt(m[1], 10);
-  let mm = parseInt(m[2], 10);
-  const yyyy = parseInt(m[3], 10);
-  if (mm < 1 || mm > 12) return null;
-  const daysInMonth = new Date(yyyy, mm, 0).getDate();
-  if (dd < 1 || dd > daysInMonth) return null;
-  return `${yyyy}-${pad2(mm)}-${pad2(dd)}`;
-}
-function normalizeTime(input: string): string {
-  const digits = input.replace(/\D/g, "");
-  if (digits.length === 0) return "";
-  let h = 0, m = 0;
-  if (digits.length <= 2) {
-    h = parseInt(digits, 10);
-    m = 0;
-  } else if (digits.length === 3) {
-    h = parseInt(digits.slice(0, 1), 10);
-    m = parseInt(digits.slice(1), 10);
-  } else {
-    h = parseInt(digits.slice(0, 2), 10);
-    m = parseInt(digits.slice(2, 4), 10);
-  }
-  if (isNaN(h)) h = 0;
-  if (isNaN(m)) m = 0;
-  if (h > 23) h = 23;
-  if (m > 59) m = 59;
-  return `${pad2(h)}:${pad2(m)}`;
-}
-
-export default function DateTimeSection({ formData, setFormData }: Props) {
-  const [dateText, setDateText] = useState<string>("");
-  const [startText, setStartText] = useState<string>(formData.starttid ?? "");
-  const [sluttText, setSluttText] = useState<string>(formData.sluttid ?? "");
-  const calendarRef = useRef<HTMLInputElement>(null);
-
-  // Fyll dagens dato ved første render dersom dato mangler
-  useEffect(() => {
-    if (!formData.dato) {
-      const iso = todayISO();
-      setFormData({ ...formData, dato: iso });
-      setDateText(isoToDisplay(iso)); // dd/mm/yyyy
-    } else {
-      setDateText(isoToDisplay(formData.dato));
-    }
-    // kun første mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Hold visningen i sync hvis dato endres utenfra
-  useEffect(() => {
-    if (!formData.dato) setDateText("");
-    else setDateText(isoToDisplay(formData.dato));
-  }, [formData.dato]);
-
-  // Hold tidstekst i sync mot formData
-  useEffect(() => setStartText(formData.starttid ?? ""), [formData.starttid]);
-  useEffect(() => setSluttText(formData.sluttid ?? ""), [formData.sluttid]);
-
-  const dateIsValid = useMemo(() => !!displayToISO(dateText), [dateText]);
-
-  const setISODate = (iso: string) => {
-    setFormData({ ...formData, dato: iso });
-    setDateText(isoToDisplay(iso));
+export default function DateTimeSection({
+  kostnader = [],
+  setKostnader,
+  loyver = [],
+}: Props) {
+  const patch = (idx: number, changes: Partial<KostRad>) => {
+    const updated = [...kostnader];
+    updated[idx] = { ...updated[idx], ...changes };
+    setKostnader(updated);
   };
 
-  const handleDateChange = (val: string) => {
-    setDateText(val);
-    const iso = displayToISO(val);
-    if (iso) setFormData({ ...formData, dato: iso });
-    else {
-      const { dato, ...rest } = formData;
-      setFormData(rest);
-    }
-  };
-  const handleDateBlur = () => {
-    const iso = displayToISO(dateText);
-    if (iso) setISODate(iso);
-    else if (!dateText.trim()) {
-      const { dato, ...rest } = formData;
-      setFormData(rest);
-    }
-  };
-
-  const handleTimeChange = (field: "starttid" | "sluttid", raw: string) => {
-    const next = raw.replace(/[^\d:]/g, "");
-    if (field === "starttid") setStartText(next);
-    else setSluttText(next);
-  };
-  const handleTimeBlur = (field: "starttid" | "sluttid", raw: string) => {
-    const norm = normalizeTime(raw);
-    if (field === "starttid") setStartText(norm);
-    else setSluttText(norm);
-    // tom streng er OK (valgfrie)
-    setFormData({ ...formData, [field]: norm });
-  };
-
-  const openCalendar = () => {
-    try {
-      // @ts-ignore
-      calendarRef.current?.showPicker?.();
-    } catch {}
-    calendarRef.current?.click();
-  };
+  const manyLoyver = (loyver?.length ?? 0) > 1;
 
   return (
     <section className="bb-section">
-      <h2 className="font-bold mb-2">Dato / Tid</h2>
+      <h2 className="font-bold mb-2">Dato og tid</h2>
+      <div className="flex flex-col gap-4">
+        {(kostnader ?? []).map((k, idx) => (
+          <div key={idx} className="bb-card p-3">
+            <div className="flex flex-wrap items-end gap-4">
+              {/* Dato */}
+              <label className="flex flex-col">
+                <span className="mb-1">Dato:</span>
+                <input
+                  type="date"
+                  className={`bb-input w-[16ch] ${!k.dato ? "bb-input--error" : ""}`}
+                  aria-invalid={!k.dato}
+                  value={k.dato || ""}
+                  onChange={(e) => patch(idx, { dato: e.target.value })}
+                />
+              </label>
 
-      <div className="flex flex-wrap gap-6 items-end">
-        {/* Dato */}
-        <label className="flex flex-col">
-          <span className="mb-1">Dato:</span>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="dd/mm/yyyy"
-              value={dateText}
-              onChange={(e) => handleDateChange(e.target.value)}
-              onBlur={handleDateBlur}
-              className={`bb-input w-[13ch] text-center tracking-wider ${dateIsValid ? "" : "bb-input--error"}`}
-            />
-            <button
-              type="button"
-              onClick={openCalendar}
-              className="bb-input px-2 py-1"
-              title="Velg dato"
-            >
-              📅
-            </button>
-            <input
-              ref={calendarRef}
-              type="date"
-              value={formData.dato ?? ""}
-              onChange={(e) => {
-                const iso = e.target.value;
-                if (iso) setISODate(iso);
-              }}
-              className="hidden"
-            />
+              {/* Starttid */}
+              <label className="flex flex-col">
+                <span className="mb-1">Start:</span>
+                <input
+                  type="time"
+                  className={`bb-input w-[10ch] ${!k.starttid ? "bb-input--error" : ""}`}
+                  aria-invalid={!k.starttid}
+                  value={k.starttid || ""}
+                  onChange={(e) => patch(idx, { starttid: e.target.value })}
+                />
+              </label>
+
+              {/* Slutttid */}
+              <label className="flex flex-col">
+                <span className="mb-1">Slutt:</span>
+                <input
+                  type="time"
+                  className={`bb-input w-[10ch] ${!k.slutttid ? "bb-input--error" : ""}`}
+                  aria-invalid={!k.slutttid}
+                  value={k.slutttid || ""}
+                  onChange={(e) => patch(idx, { slutttid: e.target.value })}
+                />
+              </label>
+
+              {/* TurNr dropdown */}
+              <label className="flex flex-col">
+                <span className="mb-1">Tur nr:</span>
+                <select
+                  className="bb-select w-[10ch]"
+                  value={k.turNr ?? idx + 1}
+                  onChange={(e) =>
+                    patch(idx, { turNr: parseInt(e.target.value, 10) })
+                  }
+                >
+                  {(kostnader ?? []).map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {/* Løyve dropdown hvis flere valgt */}
+              {manyLoyver && (
+                <label className="flex flex-col">
+                  <span className="mb-1">Løyve:</span>
+                  <select
+                    className={`bb-select w-[12ch] ${!k.loyve ? "bb-input--error" : ""}`}
+                    aria-invalid={!k.loyve}
+                    value={k.loyve ?? ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const info = (loyver ?? []).find((l) => l.loyve === val);
+                      patch(idx, { loyve: info?.loyve ?? val });
+                    }}
+                  >
+                    <option value="">-- Velg --</option>
+                    {(loyver ?? []).map((l) => (
+                      <option key={l.loyve} value={l.loyve}>
+                        {l.loyve}
+                      </option>
+                    ))}
+                  </select>
+                  {!k.loyve && (
+                    <p className="mt-1 text-sm text-red-600">
+                      Du må velge løyve
+                    </p>
+                  )}
+                </label>
+              )}
+            </div>
           </div>
-        </label>
-
-        {/* Starttid (valgfri) */}
-        <label className="flex flex-col">
-          <span className="mb-1">Start:</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="hh:mm"
-            value={startText}
-            onChange={(e) => handleTimeChange("starttid", e.target.value)}
-            onBlur={(e) => handleTimeBlur("starttid", e.target.value)}
-            className="bb-input w-[7ch] text-center"
-          />
-        </label>
-
-        {/* Sluttid (valgfri) */}
-        <label className="flex flex-col">
-          <span className="mb-1">Slutt:</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="hh:mm"
-            value={sluttText}
-            onChange={(e) => handleTimeChange("sluttid", e.target.value)}
-            onBlur={(e) => handleTimeBlur("sluttid", e.target.value)}
-            className="bb-input w-[7ch] text-center"
-          />
-        </label>
+        ))}
       </div>
     </section>
   );

@@ -1,5 +1,11 @@
 // src/components/KostnaderSection.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, forwardRef } from "react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import nb from "date-fns/locale/nb";
+import { FaCalendarAlt } from "react-icons/fa";
+
+registerLocale("nb", nb);
 
 interface KostRad {
   kvittnr?: string;
@@ -12,6 +18,9 @@ interface KostRad {
   loyve?: string;
   sjoforId?: string;
   sjoforNavn?: string;
+  dato?: string;
+  starttid?: string;
+  slutttid?: string;
 }
 
 interface LoyveInfo {
@@ -26,6 +35,31 @@ interface Props {
   loyver: LoyveInfo[];
 }
 
+// Custom input for DatePicker: tekstfelt + knapp
+const DateInput = forwardRef<
+  HTMLDivElement,
+  {
+    value?: string;
+    onClick?: () => void;
+    hasError?: boolean;
+  }
+>(({ value, onClick, hasError }, ref) => (
+  <div ref={ref as any} className="flex items-center gap-1">
+    <input
+      className={`bb-input w-[12ch] ${hasError ? "bb-input--error" : ""}`}
+      value={value || ""}
+      readOnly
+    />
+    <button
+      type="button"
+      className="bb-btn px-2 flex items-center justify-center"
+      onClick={onClick}
+    >
+      <FaCalendarAlt />
+    </button>
+  </div>
+));
+
 export default function KostnaderSection({
   kostnader,
   setKostnader,
@@ -35,6 +69,14 @@ export default function KostnaderSection({
     const updated = [...kostnader];
     updated[idx] = { ...updated[idx], ...changes };
     setKostnader(updated);
+  };
+
+  const today = () => {
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   };
 
   const addRow = () => {
@@ -52,6 +94,9 @@ export default function KostnaderSection({
         loyve: only?.loyve ?? "",
         sjoforId: only?.sjoforId ?? "",
         sjoforNavn: only?.sjoforNavn ?? "",
+        dato: today(),
+        starttid: "",
+        slutttid: "",
       },
     ]);
   };
@@ -66,7 +111,6 @@ export default function KostnaderSection({
     setKostnader([]);
   };
 
-  // Hvis kun ett løyve valgt globalt → sett det automatisk på alle rader
   useEffect(() => {
     if (loyver.length === 1) {
       const only = loyver[0];
@@ -80,15 +124,11 @@ export default function KostnaderSection({
     }
   }, [loyver]);
 
-  const manyLoyver = loyver.length > 1;
-
-  // Helper
   const toNumber = (v: any) => {
     const n = Number(String(v ?? "").replace(",", "."));
     return isFinite(n) ? n : 0;
   };
 
-  // Summer per rad
   const calcTotals = (k: KostRad) => {
     const turpris = toNumber(k.turpris);
     const venting = toNumber(k.venting);
@@ -102,7 +142,6 @@ export default function KostnaderSection({
     return { total, mva };
   };
 
-  // Summer alle
   const sums = kostnader.reduce(
     (acc, k) => {
       const { total, mva } = calcTotals(k);
@@ -112,6 +151,13 @@ export default function KostnaderSection({
     },
     { total: 0, mva: 0 }
   );
+
+  const parseDate = (str?: string): Date | null => {
+    if (!str) return null;
+    const [dd, mm, yyyy] = str.split("/");
+    if (!dd || !mm || !yyyy) return null;
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  };
 
   return (
     <section className="bb-section">
@@ -147,12 +193,28 @@ export default function KostnaderSection({
               </div>
 
               <div className="flex flex-col space-y-3">
-                {/* Løyve-dropdown hvis flere enn 1 valgt globalt (obligatorisk) */}
-                {manyLoyver && (
-                  <label className="flex flex-col">
-                    <span className="mb-1">Løyve:</span>
+                {/* Løyve */}
+                <label className="flex flex-col">
+                  <span className="mb-1">Løyve:</span>
+                  {loyver.length === 0 ? (
+                    <input
+                      type="text"
+                      className="bb-input w-[12ch] bg-gray-100 text-gray-500"
+                      value="Ingen valgt"
+                      readOnly
+                    />
+                  ) : loyver.length === 1 ? (
+                    <input
+                      type="text"
+                      className="bb-input w-[12ch] bg-gray-100"
+                      value={loyver[0].loyve}
+                      readOnly
+                    />
+                  ) : (
                     <select
-                      className={`bb-select w-[12ch] ${!k.loyve ? "bb-input--error" : ""}`}
+                      className={`bb-select w-[12ch] ${
+                        !k.loyve ? "bb-input--error" : ""
+                      }`}
                       aria-invalid={!k.loyve}
                       value={k.loyve ?? ""}
                       onChange={(e) => {
@@ -172,33 +234,82 @@ export default function KostnaderSection({
                         </option>
                       ))}
                     </select>
-                    {!k.loyve && (
-                      <p className="mt-1 text-sm text-red-600">
-                        Du må velge løyve for denne turen.
-                      </p>
-                    )}
-                  </label>
-                )}
+                  )}
+                  {!k.loyve && loyver.length > 1 && (
+                    <p className="mt-1 text-sm text-red-600">
+                      Du må velge løyve for denne turen.
+                    </p>
+                  )}
+                </label>
 
-                {/* Kvitteringsnummer (obligatorisk) */}
+                {/* Dato med egen knapp */}
+                <label className="flex flex-col">
+                  <span className="mb-1">Dato:</span>
+                  <DatePicker
+                    selected={parseDate(k.dato) || parseDate(today())}
+                    onChange={(date: Date | null) => {
+                      if (date) {
+                        const dd = String(date.getDate()).padStart(2, "0");
+                        const mm = String(date.getMonth() + 1).padStart(2, "0");
+                        const yyyy = date.getFullYear();
+                        patch(idx, { dato: `${dd}/${mm}/${yyyy}` });
+                      }
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    locale="nb"
+                    customInput={
+                      <DateInput value={k.dato} hasError={!k.dato} />
+                    }
+                  />
+                </label>
+
+                {/* Start Tid */}
+                <label className="flex flex-col">
+                  <span className="mb-1">Start Tid:</span>
+                  <input
+                    type="text"
+                    placeholder="hh:mm"
+                    className="bb-input w-[10ch]"
+                    value={k.starttid || ""}
+                    onChange={(e) => patch(idx, { starttid: e.target.value })}
+                  />
+                </label>
+
+                {/* Slutt Tid */}
+                <label className="flex flex-col">
+                  <span className="mb-1">Slutt Tid:</span>
+                  <input
+                    type="text"
+                    placeholder="hh:mm"
+                    className="bb-input w-[10ch]"
+                    value={k.slutttid || ""}
+                    onChange={(e) => patch(idx, { slutttid: e.target.value })}
+                  />
+                </label>
+
+                {/* Kvitteringsnummer */}
                 <label className="flex flex-col">
                   <span className="mb-1">Kvitteringsnummer:</span>
                   <input
                     type="text"
-                    className={`bb-input w-[16ch] ${!k.kvittnr ? "bb-input--error" : ""}`}
+                    className={`bb-input w-[16ch] ${
+                      !k.kvittnr ? "bb-input--error" : ""
+                    }`}
                     value={k.kvittnr || ""}
                     onChange={(e) => patch(idx, { kvittnr: e.target.value })}
                   />
                 </label>
 
-                {/* Turpris (obligatorisk) */}
+                {/* Turpris */}
                 <label className="flex flex-col">
                   <span className="mb-1">Turpris:</span>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       inputMode="numeric"
-                      className={`bb-input w-[12ch] ${!k.turpris ? "bb-input--error" : ""}`}
+                      className={`bb-input w-[12ch] ${
+                        !k.turpris ? "bb-input--error" : ""
+                      }`}
                       value={k.turpris || ""}
                       onChange={(e) => patch(idx, { turpris: e.target.value })}
                     />
