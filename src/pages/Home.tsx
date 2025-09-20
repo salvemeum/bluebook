@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DropdownLoyver from "../components/DropdownLoyver";
 import TurinfoSection from "../components/TurinfoSection";
 import KostnaderSection from "../components/KostnaderSection";
@@ -34,7 +34,7 @@ export default function Home() {
       loyve: "",
       sjoforId: "",
       sjoforNavn: "",
-      dato: today(),       // <-- nå settes alltid dato på første tur
+      dato: today(),
       starttid: "",
       slutttid: "",
     },
@@ -47,12 +47,66 @@ export default function Home() {
       ? formData.loyver
       : loyver;
 
+  // Nullstill = refresher hele siden
+  const handleReset = () => {
+    window.location.reload();
+  };
+
+  // Tema state
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Når siden lastes → hent lagret tema eller bruk systemets
+  useEffect(() => {
+    const stored = localStorage.getItem("theme") as "light" | "dark" | null;
+    if (stored) {
+      setTheme(stored);
+      document.documentElement.classList.toggle("dark", stored === "dark");
+    } else {
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      const initialTheme = systemPrefersDark ? "dark" : "light";
+      setTheme(initialTheme);
+      document.documentElement.classList.toggle("dark", initialTheme === "dark");
+    }
+  }, []);
+
+  // Bytte tema manuelt
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    localStorage.setItem("theme", newTheme);
+  };
+
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-center">Digital Blåbok</h1>
-      <p className="text-center text-sm text-red-600">
-        Alle raude felt MÅ fyllast ut.
-      </p>
+      {/* Toppseksjon med overskrift og knapper */}
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">Digital Blåbok</h1>
+          <p className="text-sm text-red-600">
+            Alle raude felt MÅ fyllast ut.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="px-4 py-2 rounded-lg shadow-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+          >
+            🔄 Nullstill
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="px-4 py-2 rounded-lg shadow-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+          >
+            {theme === "dark" ? "☀️ Lys modus" : "🌙 Mørk modus"}
+          </button>
+        </div>
+      </div>
 
       <DropdownLoyver
         loyver={loyver}

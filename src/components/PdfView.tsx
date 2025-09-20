@@ -41,10 +41,16 @@ interface Loyve {
   sjoforNavn: string;
 }
 
+interface VedleggItem {
+  file: File;
+  preview?: string; // base64 bilde for doc/xls/pdf
+}
+
 interface Props {
   kostnader: KostRad[];
   formData?: FormData;
   loyver?: Loyve[];
+  vedlegg?: VedleggItem[];
 }
 
 const styles = StyleSheet.create({
@@ -78,7 +84,6 @@ const styles = StyleSheet.create({
     textDecoration: "underline",
   },
 
-  // --- Løyver ---
   loyveRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -89,7 +94,6 @@ const styles = StyleSheet.create({
   loyveColR: { width: "53%" },
   labelInline: { fontWeight: "bold", marginRight: 3 },
 
-  // --- Turinformasjon ---
   infoGrid: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -100,7 +104,6 @@ const styles = StyleSheet.create({
   infoLabel: { fontWeight: "bold", marginBottom: 2 },
   infoValue: {},
 
-  // --- Turkort ---
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 14,
     width: "48%",
-    backgroundColor: "#f9f9f9", // samme bakgrunn som seksjoner
+    backgroundColor: "#f9f9f9",
   },
   cardContainer: {
     flexDirection: "row",
@@ -128,15 +131,52 @@ const styles = StyleSheet.create({
     paddingTop: 3,
   },
 
-  // --- Summering ---
   sumCard: {
     border: "1pt solid #000",
     borderRadius: 4,
     padding: 12,
-    marginTop: 12, // tettere opp til turkortene
+    marginTop: 12,
     backgroundColor: "#f1f1f1",
   },
+
+  imageRow: { flexDirection: "row", marginBottom: 10 },
+  halfImage: {
+    width: "50%",
+    height: 300,
+    objectFit: "contain",
+  },
+  fullImage: {
+    width: "100%",
+    objectFit: "contain",
+    marginBottom: 10,
+  },
 });
+
+// Hjelper: splitter et stort base64-bilde i flere sider (A4 høyde ~1123 px for bredde 794)
+const splitImage = async (base64: string): Promise<string[]> => {
+  const img = new Image();
+  img.src = base64;
+  await new Promise((resolve) => {
+    img.onload = resolve;
+  });
+
+  const pageHeightPx = 1123; // tilsvarer ca A4 høyde
+  const pages: string[] = [];
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+  canvas.width = img.width;
+
+  for (let y = 0; y < img.height; y += pageHeightPx) {
+    const sliceHeight = Math.min(pageHeightPx, img.height - y);
+    canvas.height = sliceHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, y, img.width, sliceHeight, 0, 0, img.width, sliceHeight);
+    pages.push(canvas.toDataURL("image/png"));
+  }
+
+  return pages;
+};
 
 const toNumber = (v: any) => {
   const n = Number(String(v ?? "").replace(",", "."));
@@ -156,7 +196,12 @@ const calcTotals = (k: KostRad) => {
   return { total, mva };
 };
 
-export default function PdfView({ kostnader, formData, loyver = [] }: Props) {
+export default function PdfView({
+  kostnader,
+  formData,
+  loyver = [],
+  vedlegg = [],
+}: Props) {
   const sums = kostnader.reduce(
     (acc, k) => {
       const { total, mva } = calcTotals(k);
@@ -200,7 +245,8 @@ export default function PdfView({ kostnader, formData, loyver = [] }: Props) {
                   <Text style={styles.labelInline}>ID:</Text> {l.sjoforId}
                 </Text>
                 <Text style={styles.loyveColR}>
-                  <Text style={styles.labelInline}>Sjåførnavn:</Text> {l.sjoforNavn}
+                  <Text style={styles.labelInline}>Sjåførnavn:</Text>{" "}
+                  {l.sjoforNavn}
                 </Text>
               </View>
             ))}
@@ -342,7 +388,6 @@ export default function PdfView({ kostnader, formData, loyver = [] }: Props) {
                     <Text>{k.egenandel} NOK</Text>
                   </View>
                 )}
-                {/* Totalsummer for tur */}
                 <View style={styles.totalRow}>
                   <Text>Totalpris:</Text>
                   <Text>{total.toFixed(2)} NOK</Text>
@@ -370,6 +415,56 @@ export default function PdfView({ kostnader, formData, loyver = [] }: Props) {
           </View>
         )}
       </Page>
+
+      {/* Vedlegg-sider */}
+      {vedlegg.length > 0 && (
+        <>
+          {/* Første vedlegg-side med bilder */}
+          <Page size="A4" style={styles.page}>
+            <Text style={styles.sectionTitle}>Vedlegg</Text>
+
+            {/* Bilder to og to */}
+            {vedlegg
+              .filter((v) => v.file.type.startsWith("image/") && v.preview)
+              .reduce((rows: any[], file, idx, arr) => {
+                if (idx % 2 === 0) rows.push(arr.slice(idx, idx + 2));
+                return rows;
+              }, [])
+              .map((row, idx) => (
+                <View key={idx} style={styles.imageRow}>
+                  {row.map((v, i) => (
+                    <Image
+                      key={i}
+                      src={v.preview!}
+                      style={
+                        row.length === 2 ? styles.halfImage : styles.fullImage
+                      }
+                    />
+                  ))}
+                </View>
+              ))}
+          </Page>
+
+          {/* Dokumenter (preview) splittet på flere sider om nødvendig */}
+          {vedlegg
+            .filter((v) => v.preview && !v.file.type.startsWith("image/"))
+            .map((v, idx) => (
+              <React.Fragment key={`doc-${idx}`}>
+                {/*
+                  For doc/xls/pdf previews, splitt base64-bildet til A4-sider
+                */}
+                {/*
+                  NB: Må bruke promise → splitImage, men @react-pdf kan ikke await inne i JSX.
+                  For enkelthet: vi rendrer hele preview som én side,
+                  men her har vi lagt grunnlag for splitting.
+                */}
+                <Page size="A4" style={styles.page}>
+                  <Image src={v.preview!} style={styles.fullImage} />
+                </Page>
+              </React.Fragment>
+            ))}
+        </>
+      )}
     </Document>
   );
 }

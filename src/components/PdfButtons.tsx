@@ -1,79 +1,166 @@
 // src/components/PdfButtons.tsx
 import React from "react";
-import { generatePdfBlob } from "../utils/pdf"; // ✅ peker på pdf.tsx
+import { generatePdfBlob } from "../utils/pdf";
 import { btnPrimary } from "../utils/ui";
+
+interface VedleggItem {
+  file: File;
+  preview?: string; // base64-bilde for DOCX/XLSX (fra VedleggSection)
+}
 
 interface Props {
   formData?: any;
   kostnader?: any[];
-  vedlegg?: File[];
-  loyver?: { loyve: string; sjoforId: string; sjoforNavn: string }[]; // 👈 lagt til
+  loyver?: { loyve: string; sjoforId: string; sjoforNavn: string }[];
+  vedlegg?: VedleggItem[];
 }
 
-export default function PdfButtons({ formData, kostnader, vedlegg, loyver }: Props) {
-  // sikre at arrays aldri er undefined
-  const safeKostnader = kostnader ?? [];
-  const safeVedlegg = vedlegg ?? [];
-  const safeLoyver = loyver ?? [];
+// Felles funksjon for filnavn
+const makeFilename = (
+  loyver: { loyve: string; sjoforId: string; sjoforNavn: string }[]
+) => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const yyyy = today.getFullYear();
+  const datoStr = `${dd}-${mm}-${yyyy}`;
 
-  // obligatoriske felt i kostnader
-  const kostnaderOk = safeKostnader.every((k, i) => {
-    const kvittOk = (k.kvittnr ?? "").trim() !== "";
-    const turprisOk = Number(k.turpris) > 0;
+  if (loyver.length === 0) return `${datoStr}-uten-loyve.pdf`;
+
+  // Alle løyvenummer i en streng
+  const loyveNums = loyver.map((l) => l.loyve).join("_");
+  // Kun første sjåførnavn
+  const navn = loyver[0].sjoforNavn.replace(/\s+/g, "_");
+
+  return `${datoStr}-${loyveNums}-${navn}.pdf`;
+};
+
+export default function PdfButtons({
+  formData,
+  kostnader,
+  loyver,
+  vedlegg,
+}: Props) {
+  const safeKostnader = Array.isArray(kostnader) ? kostnader : [];
+  const safeLoyver = Array.isArray(loyver) ? loyver : [];
+  const safeVedlegg = Array.isArray(vedlegg) ? vedlegg : [];
+
+  const kostnaderOk = safeKostnader.every((k) => {
+    const kvittOk = String(k?.kvittnr ?? "").trim() !== "";
+    const turprisOk = Number(k?.turpris) > 0;
     return kvittOk && turprisOk;
   });
 
   const ready = kostnaderOk;
 
   const handleView = async () => {
-    console.log("🚀 Data til PDF (handleView):", { formData, loyver: safeLoyver });
-    const blob = await generatePdfBlob({
-      formData,
-      kostnader: safeKostnader,
-      loyver: safeLoyver,
-    });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+    try {
+      console.log("🚀 Data til PDF (handleView):", {
+        formData,
+        loyver: safeLoyver,
+        kostnader: safeKostnader,
+        vedlegg: safeVedlegg,
+      });
+      const bytes = await generatePdfBlob(
+        formData,
+        safeKostnader,
+        safeLoyver,
+        safeVedlegg
+      );
+      const blob = new Blob([bytes], { type: "application/pdf" });
+
+      const url = URL.createObjectURL(blob);
+      const filename = makeFilename(safeLoyver);
+      const newWindow = window.open(url, "_blank");
+      if (newWindow && newWindow.document) {
+        newWindow.document.title = filename;
+      }
+    } catch (err) {
+      console.error("Feil ved generering av PDF (visning):", err);
+    }
   };
 
   const handleSave = async () => {
-    console.log("🚀 Data til PDF (handleSave):", { formData, loyver: safeLoyver });
-    const blob = await generatePdfBlob({
-      formData,
-      kostnader: safeKostnader,
-      loyver: safeLoyver,
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "blaabok.pdf";
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      console.log("💾 Data til PDF (handleSave):", {
+        formData,
+        loyver: safeLoyver,
+        kostnader: safeKostnader,
+        vedlegg: safeVedlegg,
+      });
+      const bytes = await generatePdfBlob(
+        formData,
+        safeKostnader,
+        safeLoyver,
+        safeVedlegg
+      );
+      const blob = new Blob([bytes], { type: "application/pdf" });
+
+      const filename = makeFilename(safeLoyver);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Feil ved generering av PDF (lagre):", err);
+    }
   };
 
   const handlePrint = async () => {
-    console.log("🚀 Data til PDF (handlePrint):", { formData, loyver: safeLoyver });
-    const blob = await generatePdfBlob({
-      formData,
-      kostnader: safeKostnader,
-      loyver: safeLoyver,
-    });
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url);
-    if (win) {
-      win.addEventListener("load", () => win.print());
+    try {
+      console.log("🖨️ Data til PDF (handlePrint):", {
+        formData,
+        loyver: safeLoyver,
+        kostnader: safeKostnader,
+        vedlegg: safeVedlegg,
+      });
+      const bytes = await generatePdfBlob(
+        formData,
+        safeKostnader,
+        safeLoyver,
+        safeVedlegg
+      );
+      const blob = new Blob([bytes], { type: "application/pdf" });
+
+      const url = URL.createObjectURL(blob);
+      const filename = makeFilename(safeLoyver);
+      const win = window.open(url);
+      if (win && win.document) {
+        win.document.title = filename;
+        win.addEventListener("load", () => win.print());
+      }
+    } catch (err) {
+      console.error("Feil ved generering av PDF (skriv ut):", err);
     }
   };
 
   const handleSend = async () => {
-    console.log("🚀 Data til PDF (handleSend):", { formData, loyver: safeLoyver });
-    const blob = await generatePdfBlob({
-      formData,
-      kostnader: safeKostnader,
-      loyver: safeLoyver,
-    });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+    try {
+      console.log("✉️ Data til PDF (handleSend):", {
+        formData,
+        loyver: safeLoyver,
+        kostnader: safeKostnader,
+        vedlegg: safeVedlegg,
+      });
+      const bytes = await generatePdfBlob(
+        formData,
+        safeKostnader,
+        safeLoyver,
+        safeVedlegg
+      );
+      const blob = new Blob([bytes], { type: "application/pdf" });
+
+      const url = URL.createObjectURL(blob);
+      const filename = makeFilename(safeLoyver);
+      const win = window.open(url, "_blank");
+      if (win && win.document) {
+        win.document.title = filename;
+      }
+    } catch (err) {
+      console.error("Feil ved generering av PDF (send):", err);
+    }
   };
 
   return (
