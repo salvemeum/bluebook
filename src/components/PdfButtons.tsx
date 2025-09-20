@@ -7,12 +7,14 @@ interface Props {
   formData?: any;
   kostnader?: any[];
   vedlegg?: File[];
+  loyver?: { loyve: string; sjoforId: string; sjoforNavn: string }[]; // 👈 lagt til
 }
 
-export default function PdfButtons({ formData, kostnader, vedlegg }: Props) {
+export default function PdfButtons({ formData, kostnader, vedlegg, loyver }: Props) {
   // sikre at arrays aldri er undefined
   const safeKostnader = kostnader ?? [];
   const safeVedlegg = vedlegg ?? [];
+  const safeLoyver = loyver ?? [];
 
   // obligatoriske felt i kostnader
   const kostnaderOk = safeKostnader.every((k, i) => {
@@ -24,22 +26,22 @@ export default function PdfButtons({ formData, kostnader, vedlegg }: Props) {
   const ready = kostnaderOk;
 
   const handleView = async () => {
-    console.log("🚀 Data til PDF (handleView):", formData);
+    console.log("🚀 Data til PDF (handleView):", { formData, loyver: safeLoyver });
     const blob = await generatePdfBlob({
       formData,
       kostnader: safeKostnader,
-      vedlegg: safeVedlegg,
+      loyver: safeLoyver,
     });
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");
   };
 
   const handleSave = async () => {
-    console.log("🚀 Data til PDF (handleSave):", formData);
+    console.log("🚀 Data til PDF (handleSave):", { formData, loyver: safeLoyver });
     const blob = await generatePdfBlob({
       formData,
       kostnader: safeKostnader,
-      vedlegg: safeVedlegg,
+      loyver: safeLoyver,
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -50,11 +52,11 @@ export default function PdfButtons({ formData, kostnader, vedlegg }: Props) {
   };
 
   const handlePrint = async () => {
-    console.log("🚀 Data til PDF (handlePrint):", formData);
+    console.log("🚀 Data til PDF (handlePrint):", { formData, loyver: safeLoyver });
     const blob = await generatePdfBlob({
       formData,
       kostnader: safeKostnader,
-      vedlegg: safeVedlegg,
+      loyver: safeLoyver,
     });
     const url = URL.createObjectURL(blob);
     const win = window.open(url);
@@ -64,11 +66,11 @@ export default function PdfButtons({ formData, kostnader, vedlegg }: Props) {
   };
 
   const handleSend = async () => {
-    console.log("🚀 Data til PDF (handleSend):", formData);
+    console.log("🚀 Data til PDF (handleSend):", { formData, loyver: safeLoyver });
     const blob = await generatePdfBlob({
       formData,
       kostnader: safeKostnader,
-      vedlegg: safeVedlegg,
+      loyver: safeLoyver,
     });
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");

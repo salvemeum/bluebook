@@ -71,6 +71,38 @@ export default function KostnaderSection({
     setKostnader(updated);
   };
 
+  // ---------- Tidsformat-hjelpere ----------
+  const autoFormatToHHMM = (raw: string): string => {
+    if (!raw) return "";
+    if (raw.includes(":")) return raw; // allerede formatert
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length !== 4) return raw; // bare formater når nøyaktig 4 siffer
+    const hh = digits.slice(0, 2);
+    const mm = digits.slice(2, 4);
+    return `${hh}:${mm}`;
+  };
+
+  const handleTimeChange =
+    (idx: number, field: "starttid" | "slutttid") =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value;
+      const digits = raw.replace(/\D/g, "");
+      const value =
+        !raw.includes(":") && digits.length === 4
+          ? `${digits.slice(0, 2)}:${digits.slice(2, 4)}`
+          : raw;
+      patch(idx, { [field]: value } as Partial<KostRad>);
+    };
+
+  const handleTimeBlur =
+    (idx: number, field: "starttid" | "slutttid", value: string) => {
+      const formatted = autoFormatToHHMM(value || "");
+      if (formatted !== value) {
+        patch(idx, { [field]: formatted } as Partial<KostRad>);
+      }
+    };
+  // ----------------------------------------
+
   const today = () => {
     const d = new Date();
     const dd = String(d.getDate()).padStart(2, "0");
@@ -111,6 +143,7 @@ export default function KostnaderSection({
     setKostnader([]);
   };
 
+  // Hvis bare ett løyve er valgt, fyll det inn på alle turer
   useEffect(() => {
     if (loyver.length === 1) {
       const only = loyver[0];
@@ -123,6 +156,17 @@ export default function KostnaderSection({
       setKostnader(updated);
     }
   }, [loyver]);
+
+  // Sørg for at alle turer alltid har en dato
+  useEffect(() => {
+    const needsUpdate = kostnader.some((k) => !k.dato);
+    if (needsUpdate) {
+      const updated = kostnader.map((k) =>
+        !k.dato ? { ...k, dato: today() } : k
+      );
+      setKostnader(updated);
+    }
+  }, [kostnader]);
 
   const toNumber = (v: any) => {
     const n = Number(String(v ?? "").replace(",", "."));
@@ -246,19 +290,21 @@ export default function KostnaderSection({
                 <label className="flex flex-col">
                   <span className="mb-1">Dato:</span>
                   <DatePicker
-                    selected={parseDate(k.dato) || parseDate(today())}
+                    selected={parseDate(k.dato || today())}
                     onChange={(date: Date | null) => {
                       if (date) {
                         const dd = String(date.getDate()).padStart(2, "0");
                         const mm = String(date.getMonth() + 1).padStart(2, "0");
                         const yyyy = date.getFullYear();
                         patch(idx, { dato: `${dd}/${mm}/${yyyy}` });
+                      } else {
+                        patch(idx, { dato: today() });
                       }
                     }}
                     dateFormat="dd/MM/yyyy"
                     locale="nb"
                     customInput={
-                      <DateInput value={k.dato} hasError={!k.dato} />
+                      <DateInput value={k.dato || today()} hasError={!k.dato} />
                     }
                   />
                 </label>
@@ -271,7 +317,10 @@ export default function KostnaderSection({
                     placeholder="hh:mm"
                     className="bb-input w-[10ch]"
                     value={k.starttid || ""}
-                    onChange={(e) => patch(idx, { starttid: e.target.value })}
+                    onChange={handleTimeChange(idx, "starttid")}
+                    onBlur={() =>
+                      handleTimeBlur(idx, "starttid", k.starttid || "")
+                    }
                   />
                 </label>
 
@@ -283,7 +332,10 @@ export default function KostnaderSection({
                     placeholder="hh:mm"
                     className="bb-input w-[10ch]"
                     value={k.slutttid || ""}
-                    onChange={(e) => patch(idx, { slutttid: e.target.value })}
+                    onChange={handleTimeChange(idx, "slutttid")}
+                    onBlur={() =>
+                      handleTimeBlur(idx, "slutttid", k.slutttid || "")
+                    }
                   />
                 </label>
 

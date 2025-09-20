@@ -1,34 +1,25 @@
 // src/utils/pdf.tsx
 import { pdf } from "@react-pdf/renderer";
-import PdfDocument, { KostItem } from "../components/PdfDocument";
+import PdfView from "../components/PdfView";
 
 type GenerateArgs = {
   formData: any;
-  kostnader: KostItem[];
-  vedlegg: File[];
+  loyver: { loyve: string; sjoforId: string; sjoforNavn: string }[];
+  kostnader: any[];
 };
 
-export async function generatePdfBlob({
-  formData,
-  kostnader,
-  vedlegg,
-}: GenerateArgs): Promise<Blob> {
-  console.log("🚀 Data som sendes til PdfDocument:", {
-    formData,
-    kostnader,
-    vedlegg,
-  });
-
+export async function generatePdfBlob({ formData, loyver, kostnader }: GenerateArgs) {
   const doc = (
-    <PdfDocument
+    <PdfView
+      kostnader={Array.isArray(kostnader) ? kostnader : []}
       formData={formData}
-      kostnader={kostnader}
-      vedlegg={vedlegg}
+      loyver={Array.isArray(loyver) ? loyver : []}
     />
   );
 
   const asPdf = pdf();
   asPdf.updateContainer(doc);
   const blob = await asPdf.toBlob();
+
   return blob;
 }

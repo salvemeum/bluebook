@@ -6,6 +6,14 @@ import KostnaderSection from "../components/KostnaderSection";
 import VedleggSection from "../components/VedleggSection";
 import PdfButtons from "../components/PdfButtons";
 
+function today() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
 export default function Home() {
   const [loyver, setLoyver] = useState<
     { loyve: string; sjoforId: string; sjoforNavn: string }[]
@@ -13,7 +21,7 @@ export default function Home() {
 
   const [formData, setFormData] = useState<any>({});
 
-  // Start med én tur i kostnader
+  // Start med én tur i kostnader, inkluder dato
   const [kostnader, setKostnader] = useState<any[]>([
     {
       kvittnr: "",
@@ -26,12 +34,14 @@ export default function Home() {
       loyve: "",
       sjoforId: "",
       sjoforNavn: "",
+      dato: today(),       // <-- nå settes alltid dato på første tur
+      starttid: "",
+      slutttid: "",
     },
   ]);
 
   const [vedlegg, setVedlegg] = useState<File[]>([]);
 
-  // Hvis formData.loyver finnes, bruk den – ellers loyver fra state
   const loyverForKostnader =
     Array.isArray(formData?.loyver) && formData.loyver.length > 0
       ? formData.loyver

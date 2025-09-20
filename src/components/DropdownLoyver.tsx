@@ -226,6 +226,14 @@ export default function DropdownLoyver({
                       setActiveSuggest(item.loyve);
                       setShowSuggest(true);
                     }}
+                    onBlur={() => {
+                      // Lukk forslagslista når feltet mister fokus.
+                      // Delay så klikk på forslag rekker å trigge før blur lukker den.
+                      setTimeout(() => {
+                        setActiveSuggest(null);
+                        setShowSuggest(false);
+                      }, 150);
+                    }}
                     className={`bb-input flex-1 ${
                       navnEmpty ? "bb-input--error" : ""
                     }`}
