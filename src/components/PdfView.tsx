@@ -43,7 +43,7 @@ interface Loyve {
 
 interface VedleggItem {
   file: File;
-  preview?: string; // base64 bilde for doc/xls/pdf
+  preview?: string;
 }
 
 interface Props {
@@ -61,7 +61,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 15,
   },
-  logo: { width: 90, height: 45 },
+  logo: {
+    width: 120, // økt fra 90
+    height: 60, // økt fra 45
+    objectFit: "contain",
+  },
   companyInfo: { fontSize: 10, textAlign: "right" },
   title: {
     textAlign: "center",
@@ -75,7 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     marginBottom: 18,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f1f1f1",
   },
   sectionTitle: {
     fontWeight: "bold",
@@ -94,16 +98,6 @@ const styles = StyleSheet.create({
   loyveColR: { width: "53%" },
   labelInline: { fontWeight: "bold", marginRight: 3 },
 
-  infoGrid: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  infoCol: { width: "48%" },
-  infoItem: { marginBottom: 8 },
-  infoLabel: { fontWeight: "bold", marginBottom: 2 },
-  infoValue: {},
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -115,7 +109,7 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 14,
     width: "48%",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f1f1f1",
   },
   cardContainer: {
     flexDirection: "row",
@@ -151,32 +145,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-
-// Hjelper: splitter et stort base64-bilde i flere sider (A4 høyde ~1123 px for bredde 794)
-const splitImage = async (base64: string): Promise<string[]> => {
-  const img = new Image();
-  img.src = base64;
-  await new Promise((resolve) => {
-    img.onload = resolve;
-  });
-
-  const pageHeightPx = 1123; // tilsvarer ca A4 høyde
-  const pages: string[] = [];
-
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
-  canvas.width = img.width;
-
-  for (let y = 0; y < img.height; y += pageHeightPx) {
-    const sliceHeight = Math.min(pageHeightPx, img.height - y);
-    canvas.height = sliceHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, y, img.width, sliceHeight, 0, 0, img.width, sliceHeight);
-    pages.push(canvas.toDataURL("image/png"));
-  }
-
-  return pages;
-};
 
 const toNumber = (v: any) => {
   const n = Number(String(v ?? "").replace(",", "."));
@@ -219,7 +187,7 @@ export default function PdfView({
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Image src="/logo.png" style={styles.logo} />
+          <Image src="/logo2.png" style={styles.logo} />
           <View style={styles.companyInfo}>
             <Text>Voss Taxi SA</Text>
             <Text>Uttrågata 19</Text>
@@ -257,67 +225,74 @@ export default function PdfView({
         {formData && (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Turinformasjon</Text>
-            <View style={styles.infoGrid}>
-              <View style={styles.infoCol}>
-                {formData.bookingnr && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Bookingnummer</Text>
-                    <Text style={styles.infoValue}>{formData.bookingnr}</Text>
-                  </View>
-                )}
+            {formData.bookingnr && (
+              <View style={styles.row}>
+                <Text>
+                  <Text style={styles.labelInline}>Bookingnummer:</Text>{" "}
+                  {formData.bookingnr}
+                </Text>
+              </View>
+            )}
+            {(formData.rute || formData.kunde) && (
+              <View style={styles.row}>
                 {formData.rute && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Rutenummer</Text>
-                    <Text style={styles.infoValue}>{formData.rute}</Text>
-                  </View>
+                  <Text>
+                    <Text style={styles.labelInline}>Rutenummer:</Text>{" "}
+                    {formData.rute}
+                  </Text>
                 )}
-                {formData.for && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>For</Text>
-                    <Text style={styles.infoValue}>{formData.for}</Text>
-                  </View>
-                )}
-                {formData.fra && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Frå</Text>
-                    <Text style={styles.infoValue}>{formData.fra}</Text>
-                  </View>
-                )}
-                {formData.referanse && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Referanse</Text>
-                    <Text style={styles.infoValue}>{formData.referanse}</Text>
-                  </View>
+                {formData.kunde && (
+                  <Text>
+                    <Text style={styles.labelInline}>Kunde:</Text>{" "}
+                    {formData.kunde}
+                  </Text>
                 )}
               </View>
-
-              <View style={styles.infoCol}>
-                {formData.kunde && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Kunde</Text>
-                    <Text style={styles.infoValue}>{formData.kunde}</Text>
-                  </View>
+            )}
+            {(formData.for || formData.ved) && (
+              <View style={styles.row}>
+                {formData.for && (
+                  <Text>
+                    <Text style={styles.labelInline}>For:</Text> {formData.for}
+                  </Text>
                 )}
                 {formData.ved && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Ved</Text>
-                    <Text style={styles.infoValue}>{formData.ved}</Text>
-                  </View>
-                )}
-                {formData.til && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Til</Text>
-                    <Text style={styles.infoValue}>{formData.til}</Text>
-                  </View>
-                )}
-                {formData.merknad && (
-                  <View style={styles.infoItem}>
-                    <Text style={styles.infoLabel}>Merknad</Text>
-                    <Text style={styles.infoValue}>{formData.merknad}</Text>
-                  </View>
+                  <Text>
+                    <Text style={styles.labelInline}>Ved:</Text> {formData.ved}
+                  </Text>
                 )}
               </View>
-            </View>
+            )}
+            {(formData.fra || formData.til) && (
+              <View style={styles.row}>
+                {formData.fra && (
+                  <Text>
+                    <Text style={styles.labelInline}>Frå:</Text> {formData.fra}
+                  </Text>
+                )}
+                {formData.til && (
+                  <Text>
+                    <Text style={styles.labelInline}>Til:</Text> {formData.til}
+                  </Text>
+                )}
+              </View>
+            )}
+            {(formData.referanse || formData.merknad) && (
+              <View style={styles.row}>
+                {formData.referanse && (
+                  <Text>
+                    <Text style={styles.labelInline}>Referanse:</Text>{" "}
+                    {formData.referanse}
+                  </Text>
+                )}
+                {formData.merknad && (
+                  <Text>
+                    <Text style={styles.labelInline}>Merknad:</Text>{" "}
+                    {formData.merknad}
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
         )}
 
@@ -327,19 +302,20 @@ export default function PdfView({
             const { total, mva } = calcTotals(k);
             return (
               <View key={idx} style={styles.card} wrap={false}>
+                {/* Tur + Løyve + Dato på samme linje */}
                 <View style={styles.row}>
                   <Text style={styles.label}>Tur {idx + 1}</Text>
+                  {k.loyve && (
+                    <Text>
+                      <Text style={styles.labelInline}>Løyve:</Text> {k.loyve}
+                    </Text>
+                  )}
+                  <Text>
+                    <Text style={styles.labelInline}>Dato:</Text>{" "}
+                    {k.dato || today}
+                  </Text>
                 </View>
-                {k.loyve && (
-                  <View style={styles.row}>
-                    <Text>Løyve:</Text>
-                    <Text>{k.loyve}</Text>
-                  </View>
-                )}
-                <View style={styles.row}>
-                  <Text>Dato:</Text>
-                  <Text>{k.dato || today}</Text>
-                </View>
+
                 {(k.starttid || k.slutttid) && (
                   <View style={styles.row}>
                     {k.starttid && <Text>Starttid: {k.starttid}</Text>}
@@ -419,11 +395,8 @@ export default function PdfView({
       {/* Vedlegg-sider */}
       {vedlegg.length > 0 && (
         <>
-          {/* Første vedlegg-side med bilder */}
           <Page size="A4" style={styles.page}>
             <Text style={styles.sectionTitle}>Vedlegg</Text>
-
-            {/* Bilder to og to */}
             {vedlegg
               .filter((v) => v.file.type.startsWith("image/") && v.preview)
               .reduce((rows: any[], file, idx, arr) => {
@@ -444,20 +417,10 @@ export default function PdfView({
                 </View>
               ))}
           </Page>
-
-          {/* Dokumenter (preview) splittet på flere sider om nødvendig */}
           {vedlegg
             .filter((v) => v.preview && !v.file.type.startsWith("image/"))
             .map((v, idx) => (
               <React.Fragment key={`doc-${idx}`}>
-                {/*
-                  For doc/xls/pdf previews, splitt base64-bildet til A4-sider
-                */}
-                {/*
-                  NB: Må bruke promise → splitImage, men @react-pdf kan ikke await inne i JSX.
-                  For enkelthet: vi rendrer hele preview som én side,
-                  men her har vi lagt grunnlag for splitting.
-                */}
                 <Page size="A4" style={styles.page}>
                   <Image src={v.preview!} style={styles.fullImage} />
                 </Page>

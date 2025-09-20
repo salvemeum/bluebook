@@ -27,9 +27,8 @@ const makeFilename = (
 
   if (loyver.length === 0) return `${datoStr}-uten-loyve.pdf`;
 
-  // Alle løyvenummer i en streng
+  // Samle alle løyvenummer, men kun ett navn
   const loyveNums = loyver.map((l) => l.loyve).join("_");
-  // Kun første sjåførnavn
   const navn = loyver[0].sjoforNavn.replace(/\s+/g, "_");
 
   return `${datoStr}-${loyveNums}-${navn}.pdf`;
@@ -151,15 +150,24 @@ export default function PdfButtons({
         safeVedlegg
       );
       const blob = new Blob([bytes], { type: "application/pdf" });
-
-      const url = URL.createObjectURL(blob);
       const filename = makeFilename(safeLoyver);
-      const win = window.open(url, "_blank");
-      if (win && win.document) {
-        win.document.title = filename;
+
+      const formDataObj = new FormData();
+      formDataObj.append("file", blob, filename);
+
+      const response = await fetch("/send.php", {
+        method: "POST",
+        body: formDataObj,
+      });
+
+      if (!response.ok) {
+        throw new Error("Feil ved sending");
       }
+
+      alert("Epost sendt OK!");
     } catch (err) {
       console.error("Feil ved generering av PDF (send):", err);
+      alert("Kunne ikke sende PDF.");
     }
   };
 

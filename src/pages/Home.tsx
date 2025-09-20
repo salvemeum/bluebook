@@ -79,6 +79,24 @@ export default function Home() {
     localStorage.setItem("theme", newTheme);
   };
 
+  // 🔧 Hent inn tekstfiler via import.meta.env.BASE_URL
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}ruter.txt`)
+      .then((res) => res.text())
+      .then((data) => console.log("Ruter.txt:", data))
+      .catch((err) => console.error("Feil ruter.txt:", err));
+
+    fetch(`${import.meta.env.BASE_URL}biler.txt`)
+      .then((res) => res.text())
+      .then((data) => console.log("Biler.txt:", data))
+      .catch((err) => console.error("Feil biler.txt:", err));
+
+    fetch(`${import.meta.env.BASE_URL}sjoff.txt`)
+      .then((res) => res.text())
+      .then((data) => console.log("Sjoff.txt:", data))
+      .catch((err) => console.error("Feil sjoff.txt:", err));
+  }, []);
+
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6">
       {/* Toppseksjon med overskrift og knapper */}

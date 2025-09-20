@@ -29,7 +29,8 @@ export default function DropdownLoyver({
 
   // Last inn biler.txt (liste over løyvenummer)
   useEffect(() => {
-    fetch("/biler.txt")
+    fetch(`${import.meta.env.BASE_URL}biler.txt`)
+
       .then((res) => res.text())
       .then((text) => {
         const lines = text
@@ -43,7 +44,8 @@ export default function DropdownLoyver({
 
   // Last inn sjoff.txt (ID + navn)
   useEffect(() => {
-    fetch("/sjoff.txt")
+    fetch(`${import.meta.env.BASE_URL}sjoff.txt`)
+
       .then((res) => res.text())
       .then((text) => {
         const lines = text

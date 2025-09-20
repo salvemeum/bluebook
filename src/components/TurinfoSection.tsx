@@ -21,7 +21,8 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
   const [ruter, setRuter] = useState<Rute[]>([]);
 
   useEffect(() => {
-    fetch("/ruter.txt")
+    fetch(`${import.meta.env.BASE_URL}ruter.txt`)
+
       .then((res) => res.text())
       .then((text) => {
         const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
