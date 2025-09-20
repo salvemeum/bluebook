@@ -1,4 +1,4 @@
-// utils/ui.ts
+// src/utils/ui.ts
 export const btnBase =
   "inline-flex items-center gap-2 rounded-xl px-3 py-1.5 font-medium shadow-sm transition-colors border focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900";
 
@@ -13,9 +13,3 @@ export const btnGhost =
 
 export const btnDanger =
   `${btnBase} bg-red-600 text-white border-red-700 hover:bg-red-700 focus:ring-red-500`;
-
-export const chipDanger =
-  "px-2 py-0.5 rounded-lg border border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors";
-
-export const sectionCard =
-  "p-4 md:p-6 rounded-2xl border-2 border-gray-900/10 dark:border-white/10 bg-white/80 dark:bg-gray-900/60 backdrop-blur";

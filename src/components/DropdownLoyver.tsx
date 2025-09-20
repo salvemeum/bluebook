@@ -10,18 +10,22 @@ type LoyveEntry = {
 interface Props {
   formData: { [k: string]: any };
   setFormData: (data: any) => void;
+  turIndex: number; // NY prop: hvilken tur denne dropdownen tilhører
 }
 
-export default function DropdownLoyver({ formData, setFormData }: Props) {
+export default function DropdownLoyver({ formData, setFormData, turIndex }: Props) {
   const [biler, setBiler] = useState<string[]>([]);
   const [sjoff, setSjoff] = useState<{ id: string; navn: string }[]>([]);
   const [open, setOpen] = useState(false);
   const [activeSuggest, setActiveSuggest] = useState<string | null>(null);
   const [showSuggest, setShowSuggest] = useState(false);
 
+  const turer = Array.isArray(formData?.turer) ? formData.turer : [];
+  const currentTur = turer[turIndex] || { loyver: [] };
+
   const selected: LoyveEntry[] = useMemo(
-    () => (Array.isArray(formData?.loyver) ? formData.loyver : []),
-    [formData?.loyver]
+    () => (Array.isArray(currentTur?.loyver) ? currentTur.loyver : []),
+    [currentTur?.loyver]
   );
 
   // Last inn biler.txt
@@ -50,16 +54,23 @@ export default function DropdownLoyver({ formData, setFormData }: Props) {
       .catch(() => setSjoff([]));
   }, []);
 
+  function updateFormData(nextLoyver: LoyveEntry[]) {
+    const nextTurer = [...turer];
+    nextTurer[turIndex] = { ...currentTur, loyver: nextLoyver };
+    setFormData({ ...formData, turer: nextTurer });
+  }
+
   function toggleLoyve(loyve: string) {
     const exists = selected.find((s) => s.loyve === loyve);
     let next: LoyveEntry[];
     if (exists) {
       next = selected.filter((s) => s.loyve !== loyve);
     } else {
+      // start med tomme (skal vises rødt)
       next = [...selected, { loyve, sjoforId: "", sjoforNavn: "" }];
     }
-    setFormData({ ...formData, loyver: next });
-    setOpen(false); // Lukk dropdown etter valg
+    updateFormData(next);
+    setOpen(false);
   }
 
   function updateLoyve(loyve: string, field: "sjoforId" | "sjoforNavn", value: string) {
@@ -81,9 +92,7 @@ export default function DropdownLoyver({ formData, setFormData }: Props) {
     // Lookup fra Navn
     if (field === "sjoforNavn") {
       const formatted = capitalizeName(value);
-      const hit = sjoff.find((s) =>
-        s.navn.toLowerCase() === formatted.toLowerCase()
-      );
+      const hit = sjoff.find((s) => s.navn.toLowerCase() === formatted.toLowerCase());
       if (hit) {
         next = next.map((s) =>
           s.loyve === loyve ? { ...s, sjoforId: hit.id, sjoforNavn: hit.navn } : s
@@ -95,36 +104,35 @@ export default function DropdownLoyver({ formData, setFormData }: Props) {
       }
     }
 
-    setFormData({ ...formData, loyver: next });
+    updateFormData(next);
   }
 
+  const noneSelected = selected.length === 0;
+
   return (
-    <section className="p-4 border-2 border-black dark:border-white rounded-xl">
+    <section className="bb-section">
       <h2 className="font-bold mb-2">Løyver:</h2>
 
-      {/* Dropdown-knapp med dynamisk ramme */}
+      {/* Dropdown-knapp – OBLIGATORISK: rød når ingen valgt */}
       <div className="relative">
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={`px-4 py-2 rounded w-full text-left shadow-sm
-            ${selected.length === 0
-              ? "border-2 border-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              : "border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"}`}
+          className={`bb-input w-full text-left py-2 ${noneSelected ? "bb-input--error" : ""}`}
+          aria-invalid={noneSelected}
+          title={noneSelected ? "Velg minst ett løyve" : "Endre løyver"}
         >
-          {selected.length === 0
-            ? "Velg Løyve"
-            : selected.map((s) => s.loyve).join(", ")}
+          {noneSelected ? "Velg Løyve" : selected.map((s) => s.loyve).join(", ")}
         </button>
 
         {open && (
-          <div className="absolute z-20 mt-2 w-full rounded-lg border bg-white dark:bg-gray-800 shadow-xl max-h-60 overflow-y-auto">
+          <div className="absolute z-20 mt-2 w-full rounded-lg border-2 border-gray-800/60 dark:border-gray-200/60 bg-white dark:bg-gray-900 shadow-lg max-h-60 overflow-y-auto">
             <ul>
               {biler.map((loyve) => {
                 const checked = !!selected.find((s) => s.loyve === loyve);
                 return (
                   <li key={loyve}>
-                    <label className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                       <input
                         type="checkbox"
                         className="h-5 w-5 accent-red-600"
@@ -141,99 +149,101 @@ export default function DropdownLoyver({ formData, setFormData }: Props) {
         )}
       </div>
 
+      {/* Hjelpetekst når ingen valgt */}
+      {noneSelected && (
+        <p className="mt-2 text-sm text-red-600">Minst ett løyve er påkrevd.</p>
+      )}
+
       {/* Liste med valgte løyver */}
       <div className="mt-4 space-y-2">
-        {selected.map((item) => (
-          <div
-            key={item.loyve}
-            className="flex flex-wrap items-center gap-3 bg-gray-50 dark:bg-gray-800 p-2 rounded relative"
-          >
-            <span className="min-w-[5rem] font-semibold">{item.loyve}</span>
+        {selected.map((item) => {
+          const idEmpty = (item.sjoforId ?? "").trim().length === 0;
+          const navnEmpty = (item.sjoforNavn ?? "").trim().length === 0;
 
-            {/* ID input */}
-            <label className="flex items-center gap-2">
-              <span>ID:</span>
-              <input
-                type="text"
-                maxLength={6}
-                value={item.sjoforId}
-                onChange={(e) => updateLoyve(item.loyve, "sjoforId", e.target.value)}
-                className={`rounded px-2 py-1 w-24 bg-white dark:bg-gray-700 ${
-                  item.sjoforId.trim() === ""
-                    ? "border-2 border-primary"
-                    : "border border-gray-400 dark:border-gray-600"
-                }`}
-              />
-            </label>
+          return (
+            <div
+              key={item.loyve}
+              className="flex flex-wrap items-center gap-3 bg-gray-50 dark:bg-gray-800/60 p-3 rounded-lg border-2 border-gray-800/40 dark:border-gray-200/30"
+            >
+              <span className="min-w-[5rem] font-semibold">{item.loyve}</span>
 
-            {/* Navn input med autocomplete */}
-            <label className="flex flex-col gap-1 relative w-80 max-w-full">
-              <div className="flex items-center gap-2">
-                <span>Navn:</span>
+              {/* ID input – OBLIGATORISK */}
+              <label className="flex items-center gap-2">
+                <span>ID:</span>
                 <input
                   type="text"
-                  maxLength={35}
-                  value={item.sjoforNavn}
-                  onFocus={() => {
-                    setActiveSuggest(item.loyve);
-                    setShowSuggest(true);
-                  }}
-                  onChange={(e) => {
-                    updateLoyve(item.loyve, "sjoforNavn", e.target.value);
-                    setActiveSuggest(item.loyve);
-                    setShowSuggest(true);
-                  }}
-                  className={`rounded px-2 py-1 flex-1 bg-white dark:bg-gray-700 ${
-                    item.sjoforNavn.trim() === ""
-                      ? "border-2 border-primary"
-                      : "border border-gray-400 dark:border-gray-600"
-                  }`}
+                  maxLength={6}
+                  value={item.sjoforId ?? ""}
+                  onChange={(e) => updateLoyve(item.loyve, "sjoforId", e.target.value)}
+                  className={`bb-input w-24 ${idEmpty ? "bb-input--error" : ""}`}
+                  aria-invalid={idEmpty}
                 />
-              </div>
+              </label>
 
-              {/* Autocomplete liste */}
-              {activeSuggest === item.loyve && showSuggest && item.sjoforNavn.length > 1 && (
-                <ul className="absolute left-12 top-8 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-md max-h-40 overflow-y-auto w-64 z-10">
-                  {sjoff
-                    .filter((s) =>
-                      s.navn.toLowerCase().includes(item.sjoforNavn.toLowerCase())
-                    )
-                    .slice(0, 6)
-                    .map((s) => (
-                      <li
-                        key={s.id}
-                        onMouseDown={() => {
-                          setFormData({
-                            ...formData,
-                            loyver: selected.map((l) =>
+              {/* Navn input – OBLIGATORISK */}
+              <label className="flex flex-col gap-1 relative w-80 max-w-full">
+                <div className="flex items-center gap-2">
+                  <span>Navn:</span>
+                  <input
+                    type="text"
+                    maxLength={35}
+                    value={item.sjoforNavn ?? ""}
+                    onFocus={() => {
+                      setActiveSuggest(item.loyve);
+                      setShowSuggest(true);
+                    }}
+                    onChange={(e) => {
+                      updateLoyve(item.loyve, "sjoforNavn", e.target.value);
+                      setActiveSuggest(item.loyve);
+                      setShowSuggest(true);
+                    }}
+                    className={`bb-input flex-1 ${navnEmpty ? "bb-input--error" : ""}`}
+                    aria-invalid={navnEmpty}
+                  />
+                </div>
+
+                {/* Autocomplete liste */}
+                {activeSuggest === item.loyve && showSuggest && (item.sjoforNavn ?? "").length > 1 && (
+                  <ul className="absolute left-12 top-10 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded shadow-md max-h-40 overflow-y-auto w-64 z-10">
+                    {sjoff
+                      .filter((s) =>
+                        s.navn.toLowerCase().includes((item.sjoforNavn ?? "").toLowerCase())
+                      )
+                      .slice(0, 6)
+                      .map((s) => (
+                        <li
+                          key={s.id}
+                          onMouseDown={() => {
+                            const next = selected.map((l) =>
                               l.loyve === item.loyve
                                 ? { ...l, sjoforId: s.id, sjoforNavn: s.navn }
                                 : l
-                            ),
-                          });
-                          setActiveSuggest(null);
-                          setShowSuggest(false); // 🔑 lukk lista på valg
-                        }}
-                        className="px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                      >
-                        {s.navn} ({s.id})
-                      </li>
-                    ))}
-                </ul>
-              )}
-            </label>
+                            );
+                            updateFormData(next);
+                            setActiveSuggest(null);
+                            setShowSuggest(false);
+                          }}
+                          className="px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {s.navn} ({s.id})
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </label>
 
-            {/* Fjern knapp */}
-            <button
-              type="button"
-              onClick={() => toggleLoyve(item.loyve)}
-              className="ml-auto text-red-600 hover:text-red-800 font-bold px-2"
-              title="Fjern løyve"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+              {/* Fjern knapp */}
+              <button
+                type="button"
+                onClick={() => toggleLoyve(item.loyve)}
+                className="ml-auto text-red-600 hover:text-red-800 font-bold px-2"
+                title="Fjern løyve"
+              >
+                ✕
+              </button>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

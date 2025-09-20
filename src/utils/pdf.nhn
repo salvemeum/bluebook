@@ -1,0 +1,141 @@
+// src/utils/pdf.ts
+import { pdf } from "@react-pdf/renderer";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import PdfView, { CompanyInfo, KostItem } from "../PdfView";
+
+type GenerateArgs = {
+  formData: any;
+  kostnader: Partial<KostItem>[];
+  vedlegg: File[];
+  logoUrl?: string;
+  company?: CompanyInfo;
+};
+
+/**
+ * Bygger en pen PDF (React PDF) og fletter inn vedlegg (pdf-lib).
+ * - Innhold: logo venstre, firmainfo høyre, "Rekning" midtstilt med linje, seksjoner med rammer.
+ * - Viser KUN felter som faktisk er fylt ut (tomt skjules).
+ * - Vedlegg:
+ *    - PDF: alle sider appendes.
+ *    - Bilder (PNG/JPG): legges på egne sider, skalert.
+ *    - Andre filtyper: får en infoside.
+ */
+export async function generateBlabokPdf({
+  formData,
+  kostnader,
+  vedlegg,
+  logoUrl = "/logo.png",
+  company = {},
+}: GenerateArgs): Promise<{ blob: Blob; filename: string }> {
+  // 1) Render hovedinnhold via React-PDF
+  const doc = (
+    <PdfView
+      formData={formData}
+      loyver={Array.isArray(formData?.loyver) ? formData.loyver : []}
+      kostnader={(Array.isArray(kostnader) ? kostnader : []) as KostItem[]}
+      company={company}
+      logoUrl={logoUrl}
+    />
+  );
+  const mainBlob = await pdf(doc).toBlob();
+
+  // 2) Hvis vedlegg finnes, flett inn via pdf-lib
+  let outPdf = await PDFDocument.load(await mainBlob.arrayBuffer());
+
+  for (const file of vedlegg || []) {
+    const type = (file.type || "").toLowerCase();
+
+    // PDF-vedlegg
+    if (type === "application/pdf") {
+      try {
+        const bytes = await file.arrayBuffer();
+        const ext = await PDFDocument.load(bytes);
+        const pages = await outPdf.copyPages(ext, ext.getPageIndices());
+        pages.forEach((p) => outPdf.addPage(p));
+        continue;
+      } catch {
+        // fallthrough: lag infoside
+      }
+    }
+
+    // Bilder (jpg/jpeg/png)
+    if (type.startsWith("image/")) {
+      const bytes = await file.arrayBuffer();
+      const A4 = { w: 595.28, h: 841.89 };
+      const MARGIN = 36;
+      const pg = outPdf.addPage([A4.w, A4.h]);
+
+      try {
+        let img;
+        if (type.includes("png")) img = await outPdf.embedPng(bytes);
+        else img = await outPdf.embedJpg(bytes); // jpeg/jpg og annet image* forsøkes som jpg
+
+        const dims = img.scale(1);
+        const maxW = A4.w - MARGIN * 2;
+        const maxH = A4.h - MARGIN * 2;
+        const scale = Math.min(maxW / dims.width, maxH / dims.height);
+        const w = dims.width * scale;
+        const h = dims.height * scale;
+        const x = (A4.w - w) / 2;
+        const y = (A4.h - h) / 2;
+        // @ts-ignore
+        pg.drawImage(img, { x, y, width: w, height: h });
+      } catch {
+        // ignorer – faller videre til infoside under
+        const LINE = 16;
+        const helvetica = await outPdf.embedFont(StandardFonts.Helvetica);
+        const helveticaBold = await outPdf.embedFont(StandardFonts.HelveticaBold);
+        pg.drawText("Vedlegg (bilde kunne ikke innebygges)", {
+          x: MARGIN,
+          y: A4.h - MARGIN - 18,
+          size: 14,
+          font: helveticaBold,
+        });
+        pg.drawText(`Filnavn: ${file.name}`, {
+          x: MARGIN,
+          y: A4.h - MARGIN - 18 - LINE,
+          size: 11,
+          font: helvetica,
+        });
+      }
+
+      continue;
+    }
+
+    // Andre filtyper – infoside
+    const A4 = { w: 595.28, h: 841.89 };
+    const MARGIN = 36;
+    const LINE = 16;
+    const pg = outPdf.addPage([A4.w, A4.h]);
+
+    // Viktig: bruk StandardFonts – strengnavn krasjer
+    const helvetica = await outPdf.embedFont(StandardFonts.Helvetica);
+    const helveticaBold = await outPdf.embedFont(StandardFonts.HelveticaBold);
+
+    pg.drawText("Vedlegg", {
+      x: MARGIN,
+      y: A4.h - MARGIN - 18,
+      size: 14,
+      font: helveticaBold,
+    });
+    pg.drawText(`Filnavn: ${file.name}`, {
+      x: MARGIN,
+      y: A4.h - MARGIN - 18 - LINE,
+      size: 11,
+      font: helvetica,
+    });
+    pg.drawText(
+      "Filtypen støttes ikke for forhåndsvisning i denne PDF-en.",
+      { x: MARGIN, y: A4.h - MARGIN - 18 - LINE * 2, size: 11, font: helvetica }
+    );
+  }
+
+  const finalBytes = await outPdf.save();
+  const blob = new Blob([finalBytes], { type: "application/pdf" });
+
+  const dISO = String(formData?.dato ?? "").replaceAll("-", "");
+  const kunde = (formData?.kunde ?? "blaabok").toString().trim().replace(/\s+/g, "_");
+  const filename = `blabok_${dISO || "dato"}_${kunde || "kunde"}.pdf`;
+
+  return { blob, filename };
+}

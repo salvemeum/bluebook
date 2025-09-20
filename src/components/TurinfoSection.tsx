@@ -86,16 +86,10 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
     }
   };
 
-  // Kun disse tre er obligatoriske
-  const requiredClass = (v: string | undefined) =>
-    (v?.trim() ?? "") === ""
-      ? "border-2 border-primary"
-      : "border border-gray-400 dark:border-gray-600";
-
-  const normalClass = "border border-gray-400 dark:border-gray-600";
+  const isEmpty = (v?: string) => (v?.trim() ?? "") === "";
 
   return (
-    <section className="p-4 border-2 border-black dark:border-white rounded-xl">
+    <section className="bb-section">
       <h2 className="font-bold mb-2">Turinformasjon</h2>
 
       <div className="space-y-3">
@@ -108,7 +102,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               maxLength={8}
               value={formData.bookingnr || ""}
               onChange={(e) => setField("bookingnr", e.target.value)}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[8ch] ${normalClass}`}
+              className="bb-input w-[8ch]"
             />
           </label>
         </div>
@@ -122,7 +116,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               maxLength={8}
               value={formData.rute || ""}
               onChange={(e) => handleRuteChange(e.target.value)}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[8ch] ${normalClass}`}
+              className="bb-input w-[8ch]"
             />
           </label>
 
@@ -134,12 +128,12 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               value={formData.kunde || ""}
               onChange={(e) => handleKundeChange(e.target.value)}
               onBlur={(e) => setField("kunde", toTitleCase(e.target.value))}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[40ch] ${requiredClass(formData.kunde)}`}
+              className={`bb-input w-[40ch] ${isEmpty(formData.kunde) ? "bb-input--error" : ""}`}
             />
           </label>
         </div>
 
-        {/* For (valgfri) + Ved (valgfri) — FLYTTET OPP */}
+        {/* For (valgfri) + Ved (valgfri) */}
         <div className="flex flex-wrap gap-6 items-end">
           <label className="flex flex-col">
             <span className="mb-1">For:</span>
@@ -149,7 +143,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               value={formData.for || ""}
               onChange={(e) => setField("for", e.target.value)}
               onBlur={(e) => setField("for", toTitleCase(e.target.value))}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[40ch] ${normalClass}`}
+              className="bb-input w-[40ch]"
             />
           </label>
 
@@ -161,12 +155,12 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               value={formData.ved || ""}
               onChange={(e) => setField("ved", e.target.value)}
               onBlur={(e) => setField("ved", toTitleCase(e.target.value))}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[40ch] ${normalClass}`}
+              className="bb-input w-[40ch]"
             />
           </label>
         </div>
 
-        {/* Frå (OBLIGATORISK) + Til (OBLIGATORISK) — NEDENFOR */}
+        {/* Frå (OBLIGATORISK) + Til (OBLIGATORISK) */}
         <div className="flex flex-wrap gap-6 items-end">
           <label className="flex flex-col">
             <span className="mb-1">Frå:</span>
@@ -176,7 +170,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               value={formData.fra || ""}
               onChange={(e) => setField("fra", e.target.value)}
               onBlur={(e) => setField("fra", toTitleCase(e.target.value))}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[40ch] ${requiredClass(formData.fra)}`}
+              className={`bb-input w-[40ch] ${isEmpty(formData.fra) ? "bb-input--error" : ""}`}
             />
           </label>
 
@@ -188,7 +182,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               value={formData.til || ""}
               onChange={(e) => setField("til", e.target.value)}
               onBlur={(e) => setField("til", toTitleCase(e.target.value))}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[40ch] ${requiredClass(formData.til)}`}
+              className={`bb-input w-[40ch] ${isEmpty(formData.til) ? "bb-input--error" : ""}`}
             />
           </label>
         </div>
@@ -202,7 +196,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               maxLength={10}
               value={formData.referanse || ""}
               onChange={(e) => setField("referanse", e.target.value)}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[12ch] ${normalClass}`}
+              className="bb-input w-[12ch]"
             />
           </label>
 
@@ -212,7 +206,7 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
               rows={3}
               value={formData.merknad || ""}
               onChange={(e) => setField("merknad", e.target.value)}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 ${normalClass} resize-y`}
+              className="bb-textarea resize-y"
             />
           </label>
         </div>

@@ -5,7 +5,7 @@ interface Props {
   setFormData: (data: any) => void;
 }
 
-/** Helpers */
+/* ===== Helpers ===== */
 function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
@@ -17,7 +17,7 @@ function isoToDisplay(iso?: string): string {
   if (!iso) return "";
   const [y, m, d] = iso.split("-");
   if (!y || !m || !d) return "";
-  return `${d}/${m}/${y}`;
+  return `${d}/${m}/${y}`; // dd/mm/yyyy
 }
 function displayToISO(display: string): string | null {
   const m = display.trim().match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
@@ -57,28 +57,31 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
   const [sluttText, setSluttText] = useState<string>(formData.sluttid ?? "");
   const calendarRef = useRef<HTMLInputElement>(null);
 
+  // Fyll dagens dato ved første render dersom dato mangler
   useEffect(() => {
     if (!formData.dato) {
       const iso = todayISO();
       setFormData({ ...formData, dato: iso });
-      setDateText(isoToDisplay(iso));
+      setDateText(isoToDisplay(iso)); // dd/mm/yyyy
     } else {
       setDateText(isoToDisplay(formData.dato));
     }
+    // kun første mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Hold visningen i sync hvis dato endres utenfra
   useEffect(() => {
     if (!formData.dato) setDateText("");
     else setDateText(isoToDisplay(formData.dato));
   }, [formData.dato]);
-  useEffect(() => {
-    setStartText(formData.starttid ?? "");
-  }, [formData.starttid]);
-  useEffect(() => {
-    setSluttText(formData.sluttid ?? "");
-  }, [formData.sluttid]);
+
+  // Hold tidstekst i sync mot formData
+  useEffect(() => setStartText(formData.starttid ?? ""), [formData.starttid]);
+  useEffect(() => setSluttText(formData.sluttid ?? ""), [formData.sluttid]);
 
   const dateIsValid = useMemo(() => !!displayToISO(dateText), [dateText]);
+
   const setISODate = (iso: string) => {
     setFormData({ ...formData, dato: iso });
     setDateText(isoToDisplay(iso));
@@ -101,6 +104,7 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
       setFormData(rest);
     }
   };
+
   const handleTimeChange = (field: "starttid" | "sluttid", raw: string) => {
     const next = raw.replace(/[^\d:]/g, "");
     if (field === "starttid") setStartText(next);
@@ -110,8 +114,10 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
     const norm = normalizeTime(raw);
     if (field === "starttid") setStartText(norm);
     else setSluttText(norm);
+    // tom streng er OK (valgfrie)
     setFormData({ ...formData, [field]: norm });
   };
+
   const openCalendar = () => {
     try {
       // @ts-ignore
@@ -121,7 +127,7 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
   };
 
   return (
-    <section className="p-4 border-2 border-black dark:border-white rounded-xl">
+    <section className="bb-section">
       <h2 className="font-bold mb-2">Dato / Tid</h2>
 
       <div className="flex flex-wrap gap-6 items-end">
@@ -136,16 +142,12 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
               value={dateText}
               onChange={(e) => handleDateChange(e.target.value)}
               onBlur={handleDateBlur}
-              className={`rounded px-2 py-1 bg-white dark:bg-gray-700 w-[13ch] text-center tracking-wider ${
-                dateIsValid
-                  ? "border border-gray-400 dark:border-gray-600"
-                  : "border-2 border-primary"
-              }`}
+              className={`bb-input w-[13ch] text-center tracking-wider ${dateIsValid ? "" : "bb-input--error"}`}
             />
             <button
               type="button"
               onClick={openCalendar}
-              className="px-2 py-1 rounded border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="bb-input px-2 py-1"
               title="Velg dato"
             >
               📅
@@ -163,7 +165,7 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
           </div>
         </label>
 
-        {/* Starttid */}
+        {/* Starttid (valgfri) */}
         <label className="flex flex-col">
           <span className="mb-1">Start:</span>
           <input
@@ -173,11 +175,11 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
             value={startText}
             onChange={(e) => handleTimeChange("starttid", e.target.value)}
             onBlur={(e) => handleTimeBlur("starttid", e.target.value)}
-            className="rounded px-2 py-1 bg-white dark:bg-gray-700 w-[7ch] text-center border border-gray-400 dark:border-gray-600"
+            className="bb-input w-[7ch] text-center"
           />
         </label>
 
-        {/* Sluttid */}
+        {/* Sluttid (valgfri) */}
         <label className="flex flex-col">
           <span className="mb-1">Slutt:</span>
           <input
@@ -187,7 +189,7 @@ export default function DateTimeSection({ formData, setFormData }: Props) {
             value={sluttText}
             onChange={(e) => handleTimeChange("sluttid", e.target.value)}
             onBlur={(e) => handleTimeBlur("sluttid", e.target.value)}
-            className="rounded px-2 py-1 bg-white dark:bg-gray-700 w-[7ch] text-center border border-gray-400 dark:border-gray-600"
+            className="bb-input w-[7ch] text-center"
           />
         </label>
       </div>

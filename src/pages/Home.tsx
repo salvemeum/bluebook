@@ -1,4 +1,7 @@
+// src/pages/Home.tsx
 import { useEffect, useState } from "react";
+
+// Seksjoner (rekkefølge: Løyver → Dato/Tid → Turinfo → Kostnader → Vedlegg)
 import DropdownLoyver from "../components/DropdownLoyver";
 import DateTimeSection from "../components/DateTimeSection";
 import TurinfoSection from "../components/TurinfoSection";
@@ -7,107 +10,127 @@ import VedleggSection from "../components/VedleggSection";
 import PdfButtons from "../components/PdfButtons";
 
 export default function Home() {
-  // Dark mode med persist + system-preference fallback
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("bluebook:dark");
-      if (saved !== null) return saved === "1";
-      return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-    }
-    return false;
-  });
+  // Alltid et array, aldri undefined
+  const [loyver, setLoyver] = useState<
+    { loyve: string; sjoforId: string; sjoforNavn: string }[]
+  >([]);
 
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    if (darkMode) {
-      html.classList.add("dark");
-      body.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-      body.classList.remove("dark");
-    }
-    localStorage.setItem("bluebook:dark", darkMode ? "1" : "0");
-  }, [darkMode]);
-
-  // Global form state
   const [formData, setFormData] = useState<any>({});
-
-  // Kostnader – start med tomme strenger (så røde valideringsrammer funker)
   const [kostnader, setKostnader] = useState<any[]>([
-    { turpris: "", venting: "", bom: "", ferge: "", ekstra: "", egenandel: "" },
+    {
+      kvittnr: "",
+      loyve: "",
+      turpris: "",
+      venting: "",
+      bom: "",
+      ferge: "",
+      ekstra: "",
+      egenandel: "",
+    },
   ]);
-
   const [vedlegg, setVedlegg] = useState<File[]>([]);
+  const [dark, setDark] = useState(false);
 
-  // Tving re-mount av seksjoner for å nullstille ALT internt
-  const [resetCounter, setResetCounter] = useState(0);
-
+  // Nullstill alle data
   const handleReset = () => {
     setFormData({});
+    setLoyver([]);
     setKostnader([
-      { turpris: "", venting: "", bom: "", ferge: "", ekstra: "", egenandel: "" },
+      {
+        kvittnr: "",
+        loyve: "",
+        turpris: "",
+        venting: "",
+        bom: "",
+        ferge: "",
+        ekstra: "",
+        egenandel: "",
+      },
     ]);
     setVedlegg([]);
-    setResetCounter((n) => n + 1);
   };
+
+  // Bytt mellom dark/light theme
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [dark]);
+
+  // 🔑 Samle alle valgte løyver fra formData.turer[*].loyver
+  const allLoyverFromTurer = Array.isArray(formData?.turer)
+    ? formData.turer.flatMap((t: any) =>
+        Array.isArray(t?.loyver) ? t.loyver : []
+      )
+    : [];
+
+  const loyverForKostnader =
+    allLoyverFromTurer.length > 0
+      ? Array.from(
+          new Map(
+            allLoyverFromTurer
+              .filter((l: any) => l && l.loyve)
+              .map((l: any) => [String(l.loyve).trim(), l])
+          ).values()
+        )
+      : loyver;
 
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6">
-      {/* Header */}
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Digital Blåbok</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Alle raude felt MÅ fyllast ut
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Digital Blåbok</h1>
+        <div className="space-x-2">
           <button
+            type="button"
             onClick={handleReset}
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 shadow"
-            title="Nullstill alle felter"
+            className="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700"
           >
             Nullstill
           </button>
           <button
-            onClick={() => setDarkMode((v) => !v)}
-            className="px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-900 shadow"
-            title="Bytt tema"
+            type="button"
+            onClick={() => setDark(!dark)}
+            className="px-3 py-1 rounded-lg bg-gray-700 text-white hover:bg-gray-800"
           >
-            {darkMode ? "Lyst tema" : "Mørkt tema"}
+            Tema
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* Seksjoner – keys sørger for full reset */}
+      <p className="text-red-600">Alle raude felt MÅ fyllast ut.</p>
+
+      {/* Seksjoner */}
       <DropdownLoyver
-        key={`loyver-${resetCounter}`}
+        loyver={loyver}
+        setLoyver={setLoyver}
         formData={formData}
         setFormData={setFormData}
       />
-      <DateTimeSection
-        key={`dt-${resetCounter}`}
-        formData={formData}
-        setFormData={setFormData}
-      />
-      <TurinfoSection
-        key={`tur-${resetCounter}`}
-        formData={formData}
-        setFormData={setFormData}
-      />
+      <DateTimeSection formData={formData} setFormData={setFormData} />
+      <TurinfoSection formData={formData} setFormData={setFormData} />
       <KostnaderSection
-        key={`kost-${resetCounter}`}
         kostnader={kostnader}
         setKostnader={setKostnader}
         formData={formData}
+        // 👇 Nå får den riktig liste
+        loyver={loyverForKostnader}
       />
       <VedleggSection
-        key={`vedl-${resetCounter}`}
         vedlegg={vedlegg}
         setVedlegg={setVedlegg}
+        formData={formData}
+        setFormData={setFormData}
       />
-      <PdfButtons />
+
+      {/* PDF-knapper */}
+      <PdfButtons
+        loyver={loyver}
+        formData={formData}
+        kostnader={kostnader}
+        vedlegg={vedlegg}
+      />
     </div>
   );
 }

@@ -1,422 +1,288 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { btnPrimary, btnDanger, chipDanger, sectionCard } from "../utils/ui";
+// src/components/KostnaderSection.tsx
+import React from "react";
 
-type Loyve = { loyve: string; sjoforId?: string; sjoforNavn?: string };
-
-// Matcher Home.tsx:
-type KostItem = {
-  kvittnr: string;   // rød ramme når tomt (lengde valgfri)
-  loyve?: string;    // dropdown når >1 løyve valgt
-  turpris: string;   // ALLE beløp som STRING (kun sifre i state)
-  venting: string;
-  bom: string;
-  ferge: string;
-  ekstra: string;
-  egenandel: string;
-};
-
-interface Props {
-  kostnader: Partial<KostItem>[];
-  setKostnader: (arr: Partial<KostItem>[]) => void;
-  formData?: any;     // forventer ev. formData.loyver
-  loyver?: Loyve[];   // valgfritt: kan også sende løyver direkte
+interface KostRad {
+  kvittnr?: string;
+  turpris?: string | number;
+  venting?: string | number;
+  bom?: string | number;
+  ferge?: string | number;
+  ekstra?: string | number;
+  egenandel?: string | number;
+  loyve?: string;
+  sjoforId?: string;
+  sjoforNavn?: string;
 }
 
-/* ---------------- helpers ---------------- */
-const asStr = (v: unknown) => (v ?? "") + "";
-const onlyDigits = (s: string) => (s || "").replace(/[^\d]/g, "");
-const toNum = (s: string) => {
-  const n = parseInt(onlyDigits(s), 10);
-  return Number.isFinite(n) ? n : 0;
-};
-const formatThousands = (digits: string) => {
-  const s = onlyDigits(digits);
-  if (!s) return "";
-  return s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-};
+interface LoyveInfo {
+  loyve: string;
+  sjoforId: string;
+  sjoforNavn: string;
+}
 
-const totalOf = (k: KostItem) =>
-  toNum(k.turpris) +
-  toNum(k.venting) +
-  toNum(k.bom) +
-  toNum(k.ferge) +
-  toNum(k.ekstra) -
-  toNum(k.egenandel);
+interface Props {
+  kostnader: KostRad[];
+  setKostnader: (k: KostRad[]) => void;
+  formData: any;
+}
 
-const mva12 = (sum: number) => (sum > 0 ? sum - sum / 1.12 : 0);
-
-/* ---------------- component ---------------- */
 export default function KostnaderSection({
   kostnader,
   setKostnader,
   formData,
-  loyver: loyverProp,
 }: Props) {
-  // Løyver fra formData eller prop
-  const loyver: Loyve[] = Array.isArray(formData?.loyver)
-    ? formData.loyver
-    : Array.isArray(loyverProp)
-    ? loyverProp
+  const patch = (idx: number, changes: Partial<KostRad>) => {
+    const updated = [...kostnader];
+    updated[idx] = { ...updated[idx], ...changes };
+    setKostnader(updated);
+  };
+
+  const addRow = () => {
+    setKostnader([
+      ...kostnader,
+      {
+        kvittnr: "",
+        turpris: "",
+        venting: "",
+        bom: "",
+        ferge: "",
+        ekstra: "",
+        egenandel: "",
+        loyve: "",
+        sjoforId: "",
+        sjoforNavn: "",
+      },
+    ]);
+  };
+
+  const removeRow = (idx: number) => {
+    const updated = [...kostnader];
+    updated.splice(idx, 1);
+    setKostnader(updated);
+  };
+
+  const removeAll = () => {
+    setKostnader([]);
+  };
+
+  // 👇 Hent alle løyver direkte fra formData
+  const allLoyver = Array.isArray(formData?.turer)
+    ? formData.turer.flatMap((t: any) =>
+        Array.isArray(t?.loyver) ? t.loyver : []
+      )
     : [];
-  const manyLoyver = (loyver?.filter(Boolean)?.length ?? 0) > 1;
 
-  // Lokal sannhet for inputs — parent får sync på blur/knapper
-  const [local, setLocal] = useState<KostItem[]>(() => {
-    const src = (kostnader?.length ? kostnader : [{}]) as Partial<KostItem>[];
-    return src.map((k) => ({
-      kvittnr: asStr(k.kvittnr),
-      loyve: k.loyve ?? (manyLoyver ? loyver[0]?.loyve ?? "" : ""),
-      turpris: onlyDigits(asStr(k.turpris)),
-      venting: onlyDigits(asStr(k.venting)),
-      bom: onlyDigits(asStr(k.bom)),
-      ferge: onlyDigits(asStr(k.ferge)),
-      ekstra: onlyDigits(asStr(k.ekstra)),
-      egenandel: onlyDigits(asStr(k.egenandel)),
-    }));
-  });
+  const manyLoyver = allLoyver.length > 1;
 
-  // Hvis parent endrer ANTALL kolonner, juster lengden – ikke rør verdier
-  useEffect(() => {
-    const want = Math.max(1, kostnader?.length ?? 0);
-    if (local.length !== want) {
-      const next: KostItem[] = [];
-      for (let i = 0; i < want; i++) {
-        const k = (kostnader[i] ?? {}) as Partial<KostItem>;
-        next.push({
-          kvittnr: asStr(k.kvittnr),
-          loyve: k.loyve ?? (manyLoyver ? loyver[0]?.loyve ?? "" : ""),
-          turpris: onlyDigits(asStr(k.turpris)),
-          venting: onlyDigits(asStr(k.venting)),
-          bom: onlyDigits(asStr(k.bom)),
-          ferge: onlyDigits(asStr(k.ferge)),
-          ekstra: onlyDigits(asStr(k.ekstra)),
-          egenandel: onlyDigits(asStr(k.egenandel)),
-        });
-      }
-      setLocal(next);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kostnader?.length, manyLoyver]);
-
-  const patch = (idx: number, p: Partial<KostItem>) =>
-    setLocal((prev) => prev.map((x, i) => (i === idx ? { ...x, ...p } : x)));
-
-  // Sync TIL parent – på blur/knapper
-  const syncToParent = () => {
-    setKostnader(
-      local.map((k) => ({
-        kvittnr: k.kvittnr,
-        loyve: k.loyve,
-        turpris: k.turpris,
-        venting: k.venting,
-        bom: k.bom,
-        ferge: k.ferge,
-        ekstra: k.ekstra,
-        egenandel: k.egenandel,
-      }))
-    );
+  // Summer og MVA
+  const toNumber = (v: any) => {
+    const n = Number(String(v ?? "").replace(",", "."));
+    return isFinite(n) ? n : 0;
   };
+  const sums = kostnader.reduce(
+    (acc, k) => {
+      const turpris = toNumber(k.turpris);
+      const venting = toNumber(k.venting);
+      const ekstra = toNumber(k.ekstra);
+      const bom = toNumber(k.bom);
+      const ferge = toNumber(k.ferge);
+      const egenandel = toNumber(k.egenandel);
 
-  const emptyItem = (): KostItem => ({
-    kvittnr: "",
-    loyve: manyLoyver ? loyver[0]?.loyve ?? "" : "",
-    turpris: "",
-    venting: "",
-    bom: "",
-    ferge: "",
-    ekstra: "",
-    egenandel: "",
-  });
+      const taxable = turpris + venting + ekstra;
+      const nonTaxable = bom + ferge;
+      const mva = Math.round(taxable * 0.12);
 
-  const addCol = () => {
-    setLocal((prev) => [...prev, emptyItem()]);
-    setTimeout(syncToParent, 0);
-  };
-
-  const clearAll = () => {
-    const one = emptyItem();
-    setLocal([one]);
-    setKostnader([one]);
-  };
-
-  const deleteCol = (delIdx: number) => {
-    setLocal((prev) => {
-      if (prev.length <= 1) {
-        const one = emptyItem();
-        setTimeout(() => setKostnader([one]), 0);
-        return [one];
-      }
-      const next = prev.filter((_, i) => i !== delIdx);
-      setTimeout(() => setKostnader(next), 0);
-      return next;
-    });
-  };
-
-  const sumTotal = useMemo(() => local.reduce((a, it) => a + totalOf(it), 0), [local]);
-  const sumMva = useMemo(() => local.reduce((a, it) => a + mva12(totalOf(it)), 0), [local]);
-
-  // ---------- Fokus-lås (robust) ----------
-  const activeFid = useRef<string | null>(null);
-  const caret = useRef<{ start: number | null; end: number | null }>({ start: null, end: null });
-
-  // Gjenopprett caret KUN for aktivt felt (hindrer hopping)
-  useLayoutEffect(() => {
-    if (!activeFid.current) return;
-    const el = document.querySelector<HTMLInputElement>(`[data-fid="${activeFid.current}"]`);
-    if (!el) return;
-    const active = document.activeElement as HTMLElement | null;
-    if (!active || active.getAttribute?.("data-fid") !== activeFid.current) return;
-
-    if (el.setSelectionRange && caret.current.start !== null && caret.current.end !== null) {
-      try {
-        el.setSelectionRange(caret.current.start, caret.current.end);
-      } catch {}
-    }
-  });
-
-  const rememberCaret = (
-    fid: string,
-    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
-  ) => {
-    activeFid.current = fid;
-    caret.current = {
-      start: (e.target as HTMLInputElement).selectionStart,
-      end: (e.target as HTMLInputElement).selectionEnd,
-    };
-  };
-
-  const clearActiveIf = (fid: string) => {
-    if (activeFid.current === fid) {
-      activeFid.current = null;
-      caret.current = { start: null, end: null };
-    }
-  };
-
-  // UI-klasser
-  const box =
-    "rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border";
-  const normalBorder = "border-gray-400 dark:border-gray-600";
-  const requiredBorder = "border-red-600";
-
-  // Money input – viser tusenskille når feltet IKKE har fokus
-  const Money: React.FC<{
-    id: string;      // unikt per felt
-    v: string;       // bare sifre i state
-    onChange: (s: string) => void;
-    bold?: boolean;
-    maxLen?: number;
-  }> = ({ id, v, onChange, bold, maxLen = 8 }) => {
-    const fid = `money-${id}`;
-    const isActive = activeFid.current === fid;
-    const raw = onlyDigits(v).slice(0, maxLen);
-    const display = isActive ? raw : formatThousands(raw);
-
-    return (
-      <div className="flex items-center gap-2">
-        <input
-          data-fid={fid}
-          id={id}
-          type="text"
-          inputMode="numeric"
-          className={`${box} ${normalBorder} w-[8ch] ${bold ? "font-semibold" : ""}`}
-          value={display}
-          onChange={(e) => {
-            const next = onlyDigits(e.currentTarget.value).slice(0, maxLen);
-            onChange(next);
-            rememberCaret(fid, e);
-          }}
-          onFocus={(e) => rememberCaret(fid, e)}
-          onBlur={() => {
-            clearActiveIf(fid);
-            syncToParent();
-          }}
-        />
-        <span className="text-sm text-gray-700 dark:text-gray-200">NOK</span>
-      </div>
-    );
-  };
-
-  // Kvitteringsnummer – godkjent så lenge det ikke er tomt
-  const Kvitt: React.FC<{
-    id: string;
-    v: string;
-    onChange: (s: string) => void;
-  }> = ({ id, v, onChange }) => {
-    const fid = `kvitt-${id}`;
-    return (
-      <input
-        data-fid={fid}
-        id={id}
-        type="text"
-        inputMode="text"
-        className={`${box} ${(v ?? "").trim() === "" ? requiredBorder : normalBorder} w-[12ch]`}
-        value={v}
-        onChange={(e) => {
-          onChange(e.currentTarget.value);
-          rememberCaret(fid, e);
-        }}
-        onFocus={(e) => rememberCaret(fid, e)}
-        onBlur={() => {
-          clearActiveIf(fid);
-          syncToParent();
-        }}
-      />
-    );
-  };
+      acc.taxable += taxable;
+      acc.nonTaxable += nonTaxable;
+      acc.mva += mva;
+      acc.egenandel += egenandel;
+      return acc;
+    },
+    { taxable: 0, nonTaxable: 0, mva: 0, egenandel: 0 }
+  );
+  const sumEksMva = sums.taxable + sums.nonTaxable;
+  const totalInklMva = sumEksMva + sums.mva;
 
   return (
-    <section className={sectionCard}>
-      <div className="flex items-center justify-between mb-2">
+    <section className="bb-section">
+      <div className="flex justify-between items-center mb-2">
         <h2 className="font-bold">Kostnader</h2>
         <div className="flex gap-2">
-          <button type="button" onClick={addCol} className={btnPrimary}>
-            Legg til
+          <button type="button" className="bb-btn" onClick={addRow}>
+            ➕ Legg til tur
           </button>
-          <button type="button" onClick={clearAll} className={btnDanger}>
-            Fjern Alt
-          </button>
+          {kostnader.length > 0 && (
+            <button type="button" className="bb-btn" onClick={removeAll}>
+              🗑️ Fjern alle
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Responsiv GRID: mobil 1, desktop maks 4 per rad */}
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {local.map((k, idx) => {
-          const total = totalOf(k);
-          const mva = mva12(total);
+      {kostnader.map((k, idx) => (
+        <div key={idx} className="bb-card mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-semibold">Tur {idx + 1}</span>
+            <button
+              type="button"
+              className="text-red-600 text-sm"
+              onClick={() => removeRow(idx)}
+            >
+              Slett
+            </button>
+          </div>
 
-          return (
-            <div key={idx} className="p-3 border rounded-lg">
-              {/* Tittel + Slett (rødt kryss) */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="font-semibold">Tur {idx + 1}</div>
-                <button
-                  type="button"
-                  aria-label={`Slett Tur ${idx + 1}`}
-                  title={`Slett Tur ${idx + 1}`}
-                  onClick={() => deleteCol(idx)}
-                  className={chipDanger}
+          <div className="flex flex-col space-y-3">
+            {/* Løyve (dropdown hvis >1) */}
+            {manyLoyver && (
+              <label className="flex flex-col">
+                <span className="mb-1">Løyve:</span>
+                <select
+                  className="bb-select w-[12ch]"
+                  value={k.loyve ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const info = allLoyver.find((l: any) => l.loyve === val);
+                    patch(idx, {
+                      loyve: info?.loyve ?? val,
+                      sjoforId: info?.sjoforId ?? "",
+                      sjoforNavn: info?.sjoforNavn ?? "",
+                    });
+                  }}
                 >
-                  ✕
-                </button>
-              </div>
+                  <option value="">-- Velg --</option>
+                  {allLoyver.map((l: LoyveInfo) => (
+                    <option key={l.loyve} value={l.loyve}>
+                      {l.loyve}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
-              {/* Løyve over kvittnr når >1 løyve (smal bredde) */}
-              {manyLoyver && (
-                <div className="mb-3">
-                  <label className="block text-sm mb-1">Løyve:</label>
-                  <select
-                    className={`${box} ${normalBorder} w-[12ch]`}
-                    value={k.loyve ?? ""}
-                    onChange={(e) => patch(idx, { loyve: e.target.value })}
-                    onBlur={syncToParent}
-                  >
-                    {loyver.map((l) => (
-                      <option key={l.loyve} value={l.loyve}>
-                        {l.loyve}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            {/* Kvitteringsnummer (obligatorisk) */}
+            <label className="flex flex-col">
+              <span className="mb-1">Kvitteringsnummer:</span>
+              <input
+                type="text"
+                className={`bb-input w-[16ch] ${!k.kvittnr ? "bb-input--error" : ""}`}
+                value={k.kvittnr || ""}
+                onChange={(e) => patch(idx, { kvittnr: e.target.value })}
+              />
+            </label>
 
-              {/* Kvitteringsnummer */}
-              <div className="mb-3">
-                <label className="block text-sm mb-1">Kvitteringsnummer:</label>
-                <Kvitt
-                  id={`kvittnr-${idx}`}
-                  v={k.kvittnr}
-                  onChange={(s) => patch(idx, { kvittnr: s })}
+            {/* Turpris (obligatorisk) */}
+            <label className="flex flex-col">
+              <span className="mb-1">Turpris:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className={`bb-input w-[12ch] ${!k.turpris ? "bb-input--error" : ""}`}
+                  value={k.turpris || ""}
+                  onChange={(e) => patch(idx, { turpris: e.target.value })}
                 />
+                <span>NOK</span>
               </div>
+            </label>
 
-              {/* Linje 1–6 med NOK */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm mb-1">Turpris:</label>
-                  <Money id={`turpris-${idx}`} v={k.turpris} onChange={(s) => patch(idx, { turpris: s })} />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Venting:</label>
-                  <Money id={`venting-${idx}`} v={k.venting} onChange={(s) => patch(idx, { venting: s })} />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Bompeng:</label>
-                  <Money id={`bom-${idx}`} v={k.bom} onChange={(s) => patch(idx, { bom: s })} />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Fergepeng:</label>
-                  <Money id={`ferge-${idx}`} v={k.ferge} onChange={(s) => patch(idx, { ferge: s })} />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Ekstra:</label>
-                  <Money id={`ekstra-${idx}`} v={k.ekstra} onChange={(s) => patch(idx, { ekstra: s })} />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Eigenandel:</label>
-                  <Money id={`egen-${idx}`} v={k.egenandel} onChange={(s) => patch(idx, { egenandel: s })} />
-                </div>
-
-                {/* Totalpris */}
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Totalpris:</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      className={`${box} ${normalBorder} w-[10ch] font-semibold`}
-                      value={formatThousands(String(Math.round(total)))}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">NOK</span>
-                  </div>
-                </div>
-
-                {/* Herav MVA 12% */}
-                <div>
-                  <label className="block text-sm mb-1">Herav MVA 12%:</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      className={`${box} ${normalBorder} w-[10ch]`}
-                      value={formatThousands(String(Math.round(mva)))}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-200">NOK</span>
-                  </div>
-                </div>
+            {/* Venting */}
+            <label className="flex flex-col">
+              <span className="mb-1">Venting:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="bb-input w-[12ch]"
+                  value={k.venting || ""}
+                  onChange={(e) => patch(idx, { venting: e.target.value })}
+                />
+                <span>NOK</span>
               </div>
+            </label>
+
+            {/* Bompenger */}
+            <label className="flex flex-col">
+              <span className="mb-1">Bompenger:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="bb-input w-[12ch]"
+                  value={k.bom || ""}
+                  onChange={(e) => patch(idx, { bom: e.target.value })}
+                />
+                <span>NOK</span>
+              </div>
+            </label>
+
+            {/* Fergepeng */}
+            <label className="flex flex-col">
+              <span className="mb-1">Fergepeng:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="bb-input w-[12ch]"
+                  value={k.ferge || ""}
+                  onChange={(e) => patch(idx, { ferge: e.target.value })}
+                />
+                <span>NOK</span>
+              </div>
+            </label>
+
+            {/* Ekstra */}
+            <label className="flex flex-col">
+              <span className="mb-1">Ekstra:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="bb-input w-[12ch]"
+                  value={k.ekstra || ""}
+                  onChange={(e) => patch(idx, { ekstra: e.target.value })}
+                />
+                <span>NOK</span>
+              </div>
+            </label>
+
+            {/* Eigenandel */}
+            <label className="flex flex-col">
+              <span className="mb-1">Eigenandel:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="bb-input w-[12ch]"
+                  value={k.egenandel || ""}
+                  onChange={(e) => patch(idx, { egenandel: e.target.value })}
+                />
+                <span>NOK</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      ))}
+
+      {/* Summer og MVA */}
+      {kostnader.length > 0 && (
+        <div className="bb-card mt-4">
+          <div className="flex flex-col gap-1">
+            <div className="flex justify-between">
+              <span>Sum eks. mva</span>
+              <span>{sumEksMva} NOK</span>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Summeringer nederst */}
-      <hr className="my-4 border-gray-400 dark:border-gray-600" />
-      <div className="grid gap-3 sm:grid-cols-2 max-w-[560px]">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Total Sum:</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              className={`${box} ${normalBorder} w-[12ch] font-semibold`}
-              value={formatThousands(String(Math.round(sumTotal)))}
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200">NOK</span>
+            <div className="flex justify-between">
+              <span>MVA 12%</span>
+              <span>{sums.mva} NOK</span>
+            </div>
+            <div className="flex justify-between font-bold">
+              <span>Total inkl. mva</span>
+              <span>{totalInklMva} NOK</span>
+            </div>
           </div>
         </div>
-        <div>
-          <label className="block text-sm mb-1">Total MVA 12%:</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              className={`${box} ${normalBorder} w-[12ch]`}
-              value={formatThousands(String(Math.round(sumMva)))}
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-200">NOK</span>
-          </div>
-        </div>
-      </div>
+      )}
     </section>
   );
 }
