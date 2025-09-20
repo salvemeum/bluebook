@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   logo: {
-    width: 120, // økt fra 90
-    height: 60, // økt fra 45
+    width: 120,
+    height: 60,
     objectFit: "contain",
   },
   companyInfo: { fontSize: 10, textAlign: "right" },
@@ -117,6 +117,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   label: { fontWeight: "bold", fontSize: 12 },
+
+  // Nytt for tur-header
+  turHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    borderBottom: "0.5pt solid #000",
+    paddingBottom: 2,
+    marginBottom: 4,
+  },
+  turHeaderText: { fontWeight: "bold", fontSize: 12 },
+
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -132,6 +144,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
     backgroundColor: "#f1f1f1",
   },
+
+  boldText: { fontWeight: "bold" },
 
   imageRow: { flexDirection: "row", marginBottom: 10 },
   halfImage: {
@@ -187,7 +201,7 @@ export default function PdfView({
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Image src="/logo2.png" style={styles.logo} />
+          <Image src="/bok/logo2.png" style={styles.logo} />
           <View style={styles.companyInfo}>
             <Text>Voss Taxi SA</Text>
             <Text>Uttrågata 19</Text>
@@ -302,17 +316,16 @@ export default function PdfView({
             const { total, mva } = calcTotals(k);
             return (
               <View key={idx} style={styles.card} wrap={false}>
-                {/* Tur + Løyve + Dato på samme linje */}
-                <View style={styles.row}>
-                  <Text style={styles.label}>Tur {idx + 1}</Text>
+                {/* Tur + Løyve + Dato med strek under */}
+                <View style={styles.turHeader}>
+                  <Text style={styles.turHeaderText}>Tur {idx + 1}</Text>
                   {k.loyve && (
-                    <Text>
-                      <Text style={styles.labelInline}>Løyve:</Text> {k.loyve}
+                    <Text style={styles.turHeaderText}>
+                      Løyve: {k.loyve}
                     </Text>
                   )}
-                  <Text>
-                    <Text style={styles.labelInline}>Dato:</Text>{" "}
-                    {k.dato || today}
+                  <Text style={styles.turHeaderText}>
+                    Dato: {k.dato || today}
                   </Text>
                 </View>
 
@@ -330,8 +343,8 @@ export default function PdfView({
                 )}
                 {k.turpris && (
                   <View style={styles.row}>
-                    <Text>Turpris:</Text>
-                    <Text>{k.turpris} NOK</Text>
+                    <Text style={styles.boldText}>Turpris:</Text>
+                    <Text style={styles.boldText}>{k.turpris} NOK</Text>
                   </View>
                 )}
                 {k.venting && (
@@ -365,8 +378,8 @@ export default function PdfView({
                   </View>
                 )}
                 <View style={styles.totalRow}>
-                  <Text>Totalpris:</Text>
-                  <Text>{total.toFixed(2)} NOK</Text>
+                  <Text style={styles.boldText}>Totalpris:</Text>
+                  <Text style={styles.boldText}>{total.toFixed(2)} NOK</Text>
                 </View>
                 <View style={styles.row}>
                   <Text>Herav MVA 12%:</Text>
@@ -381,8 +394,8 @@ export default function PdfView({
         {kostnader.length > 0 && (
           <View style={styles.sumCard} wrap={false}>
             <View style={styles.row}>
-              <Text style={styles.label}>Sum totalpriser:</Text>
-              <Text>{sums.total.toFixed(2)} NOK</Text>
+              <Text style={styles.boldText}>Sum totalpriser:</Text>
+              <Text style={styles.boldText}>{sums.total.toFixed(2)} NOK</Text>
             </View>
             <View style={styles.row}>
               <Text>Herav MVA 12%:</Text>

@@ -14,7 +14,7 @@ GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 interface VedleggItem {
   file: File;
-  preview?: string;
+  previews: string[]; // flere previews per fil
 }
 
 interface Props {
@@ -49,7 +49,6 @@ export default function VedleggSection({ vedlegg, setVedlegg }: Props) {
       canvas.height = viewport.height;
 
       await page.render({ canvasContext: context, viewport }).promise;
-
       previews.push(canvas.toDataURL("image/png"));
     }
 
@@ -58,20 +57,25 @@ export default function VedleggSection({ vedlegg, setVedlegg }: Props) {
 
   const handleAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const newFiles: VedleggItem[] = [];
+
+    const newItems: VedleggItem[] = [];
 
     for (const file of Array.from(e.target.files)) {
-      let preview: string | undefined;
+      // sjekk om filen allerede finnes i state
+      const exists = vedlegg.some(
+        (v) => v.file.name === file.name && v.file.size === file.size
+      );
+      if (exists) continue;
+
+      let previews: string[] = [];
 
       if (file.type.startsWith("image/")) {
-        // Bilder rett til base64
-        preview = await fileToDataUrl(file);
-        newFiles.push({ file, preview });
+        const p = await fileToDataUrl(file);
+        previews = [p];
       } else if (
         file.type ===
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       ) {
-        // DOCX → HTML → Canvas → PNG (uten ramme/filnavn, skalert til A4)
         const buffer = await file.arrayBuffer();
         const container = document.createElement("div");
         container.style.position = "absolute";
@@ -84,25 +88,19 @@ export default function VedleggSection({ vedlegg, setVedlegg }: Props) {
           ignoreLastRenderedPageBreak: true,
         });
 
-        // Sett fast bredde ~ A4
         container.style.width = "794px";
-
-        // Fjern evt. wrappers/headers som docx-preview la inn (ramme og filnavn)
         container
           .querySelectorAll(".docx-wrapper, .docx-header, .docx-title")
           .forEach((el) => el.remove());
 
         const canvas = await html2canvas(container);
-        preview = canvas.toDataURL("image/png");
-
+        previews = [canvas.toDataURL("image/png")];
         document.body.removeChild(container);
-        newFiles.push({ file, preview });
       } else if (
         file.type === "application/vnd.ms-excel" ||
         file.type ===
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       ) {
-        // XLS/XLSX → HTML → Canvas → PNG
         const data = await file.arrayBuffer();
         const workbook = XLSX.read(data);
         const ws = workbook.Sheets[workbook.SheetNames[0]];
@@ -115,22 +113,24 @@ export default function VedleggSection({ vedlegg, setVedlegg }: Props) {
         document.body.appendChild(container);
 
         const canvas = await html2canvas(container);
-        preview = canvas.toDataURL("image/png");
+        previews = [canvas.toDataURL("image/png")];
 
         document.body.removeChild(container);
-        newFiles.push({ file, preview });
       } else if (file.type === "application/pdf") {
-        // PDF → PNG-bilder
-        const previews = await convertPdfToImages(file);
-        previews.forEach((p) => newFiles.push({ file, preview: p }));
+        previews = await convertPdfToImages(file);
       } else {
-        // Andre filer: fallback til base64
         const dataUrl = await fileToDataUrl(file);
-        newFiles.push({ file, preview: dataUrl });
+        previews = [dataUrl];
       }
+
+      newItems.push({ file, previews });
     }
 
-    setVedlegg((prev) => [...prev, ...newFiles]);
+    if (newItems.length > 0) {
+      setVedlegg((prev) => [...prev, ...newItems]);
+    }
+
+    // reset input så samme fil kan velges på nytt senere
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 

@@ -79,24 +79,6 @@ export default function Home() {
     localStorage.setItem("theme", newTheme);
   };
 
-  // 🔧 Hent inn tekstfiler via import.meta.env.BASE_URL
-  useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}ruter.txt`)
-      .then((res) => res.text())
-      .then((data) => console.log("Ruter.txt:", data))
-      .catch((err) => console.error("Feil ruter.txt:", err));
-
-    fetch(`${import.meta.env.BASE_URL}biler.txt`)
-      .then((res) => res.text())
-      .then((data) => console.log("Biler.txt:", data))
-      .catch((err) => console.error("Feil biler.txt:", err));
-
-    fetch(`${import.meta.env.BASE_URL}sjoff.txt`)
-      .then((res) => res.text())
-      .then((data) => console.log("Sjoff.txt:", data))
-      .catch((err) => console.error("Feil sjoff.txt:", err));
-  }, []);
-
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6">
       {/* Toppseksjon med overskrift og knapper */}
@@ -111,7 +93,10 @@ export default function Home() {
           <button
             type="button"
             onClick={handleReset}
-            className="px-4 py-2 rounded-lg shadow-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+            className="px-1.5 py-0.5 text-xs 
+             md:px-4 md:py-2 md:text-base
+             rounded-lg shadow-md bg-red-600 text-white font-semibold 
+             hover:bg-red-700 transition"
           >
             🔄 Nullstill
           </button>
@@ -119,7 +104,10 @@ export default function Home() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="px-4 py-2 rounded-lg shadow-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+            className="px-1.5 py-0.5 text-xs 
+             md:px-4 md:py-2 md:text-base
+             rounded-lg shadow-md bg-blue-600 text-white font-semibold 
+             hover:bg-blue-700 transition"
           >
             {theme === "dark" ? "☀️ Lys modus" : "🌙 Mørk modus"}
           </button>

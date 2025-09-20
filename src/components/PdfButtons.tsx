@@ -155,7 +155,7 @@ export default function PdfButtons({
       const formDataObj = new FormData();
       formDataObj.append("file", blob, filename);
 
-      const response = await fetch("/send.php", {
+      const response = await fetch("/bok/send.php", {
         method: "POST",
         body: formDataObj,
       });
