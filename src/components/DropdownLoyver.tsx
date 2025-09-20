@@ -248,7 +248,7 @@ export default function DropdownLoyver({
                         .map((s) => (
                           <li
                             key={s.id}
-                            onMouseDown={() => {
+                            onClick={() => {
                               const next = loyver.map((l) =>
                                 l.loyve === item.loyve
                                   ? {
