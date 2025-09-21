@@ -22,7 +22,6 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}ruter.txt`)
-
       .then((res) => res.text())
       .then((text) => {
         const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -93,124 +92,116 @@ export default function TurinfoSection({ formData, setFormData }: Props) {
     <section className="bb-section">
       <h2 className="font-bold mb-2">Turinformasjon</h2>
 
-      <div className="space-y-3">
-        {/* Bookingnr (valgfri) */}
-        <div className="flex flex-wrap gap-6 items-end">
-          <label className="flex flex-col">
-            <span className="mb-1">Bookingnr:</span>
-            <input
-              type="text"
-              maxLength={8}
-              value={formData.bookingnr || ""}
-              onChange={(e) => setField("bookingnr", e.target.value)}
-              className="bb-input w-[8ch]"
-            />
-          </label>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        {/* Rute.nr (valgfri) + Kunde (OBLIGATORISK) */}
-        <div className="flex flex-wrap gap-6 items-end">
-          <label className="flex flex-col">
-            <span className="mb-1">Rute.nr:</span>
-            <input
-              type="text"
-              maxLength={8}
-              value={formData.rute || ""}
-              onChange={(e) => handleRuteChange(e.target.value)}
-              className="bb-input w-[8ch]"
-            />
-          </label>
+        {/* 1) Bookingnr */}
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Bookingnr:</span>
+          <input
+            type="text"
+            maxLength={11}
+            value={formData.bookingnr || ""}
+            onChange={(e) => setField("bookingnr", e.target.value)}
+            className="bb-input w-[11ch]"
+          />
+        </label>
 
-          <label className="flex flex-col">
-            <span className="mb-1">Kunde:</span>
-            <input
-              type="text"
-              maxLength={40}
-              value={formData.kunde || ""}
-              onChange={(e) => handleKundeChange(e.target.value)}
-              onBlur={(e) => setField("kunde", toTitleCase(e.target.value))}
-              className={`bb-input w-[40ch] ${isEmpty(formData.kunde) ? "bb-input--error" : ""}`}
-            />
-          </label>
-        </div>
+        <div className="hidden md:block" />
 
-        {/* For (valgfri) + Ved (valgfri) */}
-        <div className="flex flex-wrap gap-6 items-end">
-          <label className="flex flex-col">
-            <span className="mb-1">For:</span>
-            <input
-              type="text"
-              maxLength={40}
-              value={formData.for || ""}
-              onChange={(e) => setField("for", e.target.value)}
-              onBlur={(e) => setField("for", toTitleCase(e.target.value))}
-              className="bb-input w-[40ch]"
-            />
-          </label>
+        {/* 2) Rute.nr + Kunde */}
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Rute.nr:</span>
+          <input
+            type="text"
+            maxLength={8}
+            value={formData.rute || ""}
+            onChange={(e) => handleRuteChange(e.target.value)}
+            className="bb-input w-[8ch]"
+          />
+        </label>
 
-          <label className="flex flex-col">
-            <span className="mb-1">Ved:</span>
-            <input
-              type="text"
-              maxLength={40}
-              value={formData.ved || ""}
-              onChange={(e) => setField("ved", e.target.value)}
-              onBlur={(e) => setField("ved", toTitleCase(e.target.value))}
-              className="bb-input w-[40ch]"
-            />
-          </label>
-        </div>
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Kunde:</span>
+          <input
+            type="text"
+            maxLength={40}
+            value={formData.kunde || ""}
+            onChange={(e) => handleKundeChange(e.target.value)}
+            onBlur={(e) => setField("kunde", toTitleCase(e.target.value))}
+            className={`bb-input w-full ${isEmpty(formData.kunde) ? "bb-input--error" : ""}`}
+          />
+        </label>
 
-        {/* Frå (OBLIGATORISK) + Til (OBLIGATORISK) */}
-        <div className="flex flex-wrap gap-6 items-end">
-          <label className="flex flex-col">
-            <span className="mb-1">Frå:</span>
-            <input
-              type="text"
-              maxLength={40}
-              value={formData.fra || ""}
-              onChange={(e) => setField("fra", e.target.value)}
-              onBlur={(e) => setField("fra", toTitleCase(e.target.value))}
-              className={`bb-input w-[40ch] ${isEmpty(formData.fra) ? "bb-input--error" : ""}`}
-            />
-          </label>
+        {/* 3) For + Ved */}
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">For:</span>
+          <input
+            type="text"
+            maxLength={40}
+            value={formData.for || ""}
+            onChange={(e) => setField("for", e.target.value)}
+            className="bb-input w-full"
+          />
+        </label>
 
-          <label className="flex flex-col">
-            <span className="mb-1">Til:</span>
-            <input
-              type="text"
-              maxLength={40}
-              value={formData.til || ""}
-              onChange={(e) => setField("til", e.target.value)}
-              onBlur={(e) => setField("til", toTitleCase(e.target.value))}
-              className={`bb-input w-[40ch] ${isEmpty(formData.til) ? "bb-input--error" : ""}`}
-            />
-          </label>
-        </div>
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Ved:</span>
+          <input
+            type="text"
+            maxLength={40}
+            value={formData.ved || ""}
+            onChange={(e) => setField("ved", e.target.value)}
+            className="bb-input w-full"
+          />
+        </label>
 
-        {/* Referanse (valgfri) + Merknad (valgfri) */}
-        <div className="flex flex-wrap gap-6 items-start">
-          <label className="flex flex-col">
-            <span className="mb-1">Referanse:</span>
-            <input
-              type="text"
-              maxLength={10}
-              value={formData.referanse || ""}
-              onChange={(e) => setField("referanse", e.target.value)}
-              className="bb-input w-[12ch]"
-            />
-          </label>
+        {/* 4) Frå + Til */}
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Frå:</span>
+          <input
+            type="text"
+            maxLength={40}
+            value={formData.fra || ""}
+            onChange={(e) => setField("fra", e.target.value)}
+            className={`bb-input w-full ${isEmpty(formData.fra) ? "bb-input--error" : ""}`}
+          />
+        </label>
 
-          <label className="flex flex-col flex-1 min-w-[300px]">
-            <span className="mb-1">Merknad:</span>
-            <textarea
-              rows={3}
-              value={formData.merknad || ""}
-              onChange={(e) => setField("merknad", e.target.value)}
-              className="bb-textarea resize-y"
-            />
-          </label>
-        </div>
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Til:</span>
+          <input
+            type="text"
+            maxLength={40}
+            value={formData.til || ""}
+            onChange={(e) => setField("til", e.target.value)}
+            className={`bb-input w-full ${isEmpty(formData.til) ? "bb-input--error" : ""}`}
+          />
+        </label>
+
+        {/* 5) Referanse */}
+        <label className="flex flex-col min-w-0">
+          <span className="mb-1">Referanse:</span>
+          <input
+            type="text"
+            maxLength={24}
+            value={formData.referanse || ""}
+            onChange={(e) => setField("referanse", e.target.value)}
+            className="bb-input w-[24ch]"
+          />
+        </label>
+
+        <div className="hidden md:block" />
+
+        {/* 6) Merknad */}
+        <label className="flex flex-col md:col-span-2 min-w-0">
+          <span className="mb-1">Merknad:</span>
+          <textarea
+            rows={3}
+            value={formData.merknad || ""}
+            onChange={(e) => setField("merknad", e.target.value)}
+            className="bb-textarea resize-y w-full"
+          />
+        </label>
       </div>
     </section>
   );

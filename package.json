@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.0",
+    "buffer": "^6.0.3",
     "date-fns": "^4.1.0",
     "docx-preview": "^0.3.6",
     "html2canvas": "^1.4.1",

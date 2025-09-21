@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
   },
   label: { fontWeight: "bold", fontSize: 12 },
 
-  // Nytt for tur-header
   turHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -147,14 +146,15 @@ const styles = StyleSheet.create({
 
   boldText: { fontWeight: "bold" },
 
-  imageRow: { flexDirection: "row", marginBottom: 10 },
+  imageRow: { flexDirection: "row", justifyContent: "space-between" },
   halfImage: {
-    width: "50%",
+    width: "48%",
     height: 300,
     objectFit: "contain",
   },
   fullImage: {
     width: "100%",
+    height: 500,
     objectFit: "contain",
     marginBottom: 10,
   },
@@ -221,10 +221,12 @@ export default function PdfView({
             {loyver.map((l, idx) => (
               <View key={idx} style={styles.loyveRow} wrap={false}>
                 <Text style={styles.loyveColL}>
-                  <Text style={styles.labelInline}>Løyve:</Text> {l.loyve}
+                  <Text style={styles.labelInline}>Løyve:</Text>{" "}
+                  {l.loyve}
                 </Text>
                 <Text style={styles.loyveColM}>
-                  <Text style={styles.labelInline}>ID:</Text> {l.sjoforId}
+                  <Text style={styles.labelInline}>ID:</Text>{" "}
+                  {l.sjoforId}
                 </Text>
                 <Text style={styles.loyveColR}>
                   <Text style={styles.labelInline}>Sjåførnavn:</Text>{" "}
@@ -239,90 +241,120 @@ export default function PdfView({
         {formData && (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Turinformasjon</Text>
+
+            {/* Rad 1 */}
             {formData.bookingnr && (
               <View style={styles.row}>
-                <Text>
-                  <Text style={styles.labelInline}>Bookingnummer:</Text>{" "}
-                  {formData.bookingnr}
-                </Text>
+                <View style={{ width: "48%" }}>
+                  <Text>
+                    <Text style={{ fontWeight: "bold" }}>Bookingnummer:</Text>
+                    {"\u00A0\u00A0"}{formData.bookingnr}
+                  </Text>
+                </View>
+                <View style={{ width: "48%" }} />
               </View>
             )}
+
+            {/* Rad 2 */}
             {(formData.rute || formData.kunde) && (
               <View style={styles.row}>
-                {formData.rute && (
-                  <Text>
-                    <Text style={styles.labelInline}>Rutenummer:</Text>{" "}
-                    {formData.rute}
-                  </Text>
-                )}
-                {formData.kunde && (
-                  <Text>
-                    <Text style={styles.labelInline}>Kunde:</Text>{" "}
-                    {formData.kunde}
-                  </Text>
-                )}
+                <View style={{ width: "48%" }}>
+                  {formData.rute && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Rutenummer:</Text>
+                      {"\u00A0\u00A0"}{formData.rute}
+                    </Text>
+                  )}
+                </View>
+                <View style={{ width: "48%" }}>
+                  {formData.kunde && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Kunde:</Text>
+                      {"\u00A0\u00A0"}{formData.kunde}
+                    </Text>
+                  )}
+                </View>
               </View>
             )}
+
+            {/* Rad 3 */}
             {(formData.for || formData.ved) && (
               <View style={styles.row}>
-                {formData.for && (
-                  <Text>
-                    <Text style={styles.labelInline}>For:</Text> {formData.for}
-                  </Text>
-                )}
-                {formData.ved && (
-                  <Text>
-                    <Text style={styles.labelInline}>Ved:</Text> {formData.ved}
-                  </Text>
-                )}
+                <View style={{ width: "48%" }}>
+                  {formData.for && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>For:</Text>
+                      {"\u00A0\u00A0"}{formData.for}
+                    </Text>
+                  )}
+                </View>
+                <View style={{ width: "48%" }}>
+                  {formData.ved && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Ved:</Text>
+                      {"\u00A0\u00A0"}{formData.ved}
+                    </Text>
+                  )}
+                </View>
               </View>
             )}
+
+            {/* Rad 4 */}
             {(formData.fra || formData.til) && (
               <View style={styles.row}>
-                {formData.fra && (
-                  <Text>
-                    <Text style={styles.labelInline}>Frå:</Text> {formData.fra}
-                  </Text>
-                )}
-                {formData.til && (
-                  <Text>
-                    <Text style={styles.labelInline}>Til:</Text> {formData.til}
-                  </Text>
-                )}
+                <View style={{ width: "48%" }}>
+                  {formData.fra && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Frå:</Text>
+                      {"\u00A0\u00A0"}{formData.fra}
+                    </Text>
+                  )}
+                </View>
+                <View style={{ width: "48%" }}>
+                  {formData.til && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Til:</Text>
+                      {"\u00A0\u00A0"}{formData.til}
+                    </Text>
+                  )}
+                </View>
               </View>
             )}
+
+            {/* Rad 5 */}
             {(formData.referanse || formData.merknad) && (
               <View style={styles.row}>
-                {formData.referanse && (
-                  <Text>
-                    <Text style={styles.labelInline}>Referanse:</Text>{" "}
-                    {formData.referanse}
-                  </Text>
-                )}
-                {formData.merknad && (
-                  <Text>
-                    <Text style={styles.labelInline}>Merknad:</Text>{" "}
-                    {formData.merknad}
-                  </Text>
-                )}
+                <View style={{ width: "48%" }}>
+                  {formData.referanse && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Referanse:</Text>
+                      {"\u00A0\u00A0"}{formData.referanse}
+                    </Text>
+                  )}
+                </View>
+                <View style={{ width: "48%" }}>
+                  {formData.merknad && (
+                    <Text>
+                      <Text style={{ fontWeight: "bold" }}>Merknad:</Text>
+                      {"\u00A0\u00A0"}{formData.merknad}
+                    </Text>
+                  )}
+                </View>
               </View>
             )}
           </View>
         )}
 
-        {/* Kostnader per tur */}
+        {/* Kostnader */}
         <View style={styles.cardContainer}>
           {kostnader.map((k, idx) => {
             const { total, mva } = calcTotals(k);
             return (
               <View key={idx} style={styles.card} wrap={false}>
-                {/* Tur + Løyve + Dato med strek under */}
                 <View style={styles.turHeader}>
                   <Text style={styles.turHeaderText}>Tur {idx + 1}</Text>
                   {k.loyve && (
-                    <Text style={styles.turHeaderText}>
-                      Løyve: {k.loyve}
-                    </Text>
+                    <Text style={styles.turHeaderText}>Løyve: {k.loyve}</Text>
                   )}
                   <Text style={styles.turHeaderText}>
                     Dato: {k.dato || today}
@@ -331,59 +363,52 @@ export default function PdfView({
 
                 {(k.starttid || k.slutttid) && (
                   <View style={styles.row}>
-                    {k.starttid && <Text>Starttid: {k.starttid}</Text>}
-                    {k.slutttid && <Text>Slutttid: {k.slutttid}</Text>}
+                    {k.starttid && <Text>Starttid:{"\u00A0"}{k.starttid}</Text>}
+                    {k.slutttid && <Text>Slutttid:{"\u00A0"}{k.slutttid}</Text>}
                   </View>
                 )}
                 {k.kvittnr && (
                   <View style={styles.row}>
-                    <Text>Kvitteringsnummer:</Text>
-                    <Text>{k.kvittnr}</Text>
+                    <Text>Kvitteringsnummer:{"\u00A0"}{k.kvittnr}</Text>
                   </View>
                 )}
                 {k.turpris && (
                   <View style={styles.row}>
-                    <Text style={styles.boldText}>Turpris:</Text>
+                    <Text style={styles.boldText}>Turpris:{"\u00A0"}</Text>
                     <Text style={styles.boldText}>{k.turpris} NOK</Text>
                   </View>
                 )}
                 {k.venting && (
                   <View style={styles.row}>
-                    <Text>+Venting:</Text>
-                    <Text>{k.venting} NOK</Text>
+                    <Text>+Venting:{"\u00A0"}{k.venting} NOK</Text>
                   </View>
                 )}
                 {k.bom && (
                   <View style={styles.row}>
-                    <Text>+Bompeng:</Text>
-                    <Text>{k.bom} NOK</Text>
+                    <Text>+Bompeng:{"\u00A0"}{k.bom} NOK</Text>
                   </View>
                 )}
                 {k.ferge && (
                   <View style={styles.row}>
-                    <Text>+Fergepeng:</Text>
-                    <Text>{k.ferge} NOK</Text>
+                    <Text>+Fergepeng:{"\u00A0"}{k.ferge} NOK</Text>
                   </View>
                 )}
                 {k.ekstra && (
                   <View style={styles.row}>
-                    <Text>+Ekstra:</Text>
-                    <Text>{k.ekstra} NOK</Text>
+                    <Text>+Ekstra:{"\u00A0"}{k.ekstra} NOK</Text>
                   </View>
                 )}
                 {k.egenandel && (
                   <View style={styles.row}>
-                    <Text>-Eigeandel:</Text>
-                    <Text>{k.egenandel} NOK</Text>
+                    <Text>-Eigeandel:{"\u00A0"}{k.egenandel} NOK</Text>
                   </View>
                 )}
                 <View style={styles.totalRow}>
-                  <Text style={styles.boldText}>Totalpris:</Text>
+                  <Text style={styles.boldText}>Totalpris:{"\u00A0"}</Text>
                   <Text style={styles.boldText}>{total.toFixed(2)} NOK</Text>
                 </View>
                 <View style={styles.row}>
-                  <Text>Herav MVA 12%:</Text>
-                  <Text>{mva.toFixed(2)} NOK</Text>
+                  <Text>Herav MVA 12%:{"\u00A0"}{mva.toFixed(2)} NOK</Text>
                 </View>
               </View>
             );
@@ -394,51 +419,65 @@ export default function PdfView({
         {kostnader.length > 0 && (
           <View style={styles.sumCard} wrap={false}>
             <View style={styles.row}>
-              <Text style={styles.boldText}>Sum totalpriser:</Text>
+              <Text style={styles.boldText}>Sum totalpriser:{"\u00A0"}</Text>
               <Text style={styles.boldText}>{sums.total.toFixed(2)} NOK</Text>
             </View>
             <View style={styles.row}>
-              <Text>Herav MVA 12%:</Text>
-              <Text>{sums.mva.toFixed(2)} NOK</Text>
+              <Text>Herav MVA 12%:{"\u00A0"}{sums.mva.toFixed(2)} NOK</Text>
             </View>
           </View>
         )}
       </Page>
 
-      {/* Vedlegg-sider */}
+      {/* Vedlegg */}
       {vedlegg.length > 0 && (
         <>
-          <Page size="A4" style={styles.page}>
-            <Text style={styles.sectionTitle}>Vedlegg</Text>
-            {vedlegg
-              .filter((v) => v.file.type.startsWith("image/") && v.preview)
-              .reduce((rows: any[], file, idx, arr) => {
-                if (idx % 2 === 0) rows.push(arr.slice(idx, idx + 2));
-                return rows;
-              }, [])
-              .map((row, idx) => (
-                <View key={idx} style={styles.imageRow}>
-                  {row.map((v, i) => (
-                    <Image
-                      key={i}
-                      src={v.preview!}
-                      style={
-                        row.length === 2 ? styles.halfImage : styles.fullImage
-                      }
-                    />
-                  ))}
+          {vedlegg
+            .filter((v) => v.preview && v.file.type.startsWith("image/"))
+            .reduce((rows: any[], v) => {
+              if (!v.preview) return rows;
+              const isLandscape = (v.file as any).width > (v.file as any).height;
+              if (isLandscape) {
+                rows.push([v]);
+              } else {
+                const lastRow = rows[rows.length - 1];
+                if (
+                  lastRow &&
+                  lastRow.length === 1 &&
+                  !((lastRow[0].file as any).width > (lastRow[0].file as any).height)
+                ) {
+                  lastRow.push(v);
+                } else {
+                  rows.push([v]);
+                }
+              }
+              return rows;
+            }, [])
+            .map((row, idx) => (
+              <Page key={`vedlegg-${idx}`} size="A4" style={styles.page}>
+                <View style={styles.imageRow}>
+                  {row.map((v, i) =>
+                    v.preview ? (
+                      <Image
+                        key={i}
+                        src={v.preview}
+                        style={row.length === 2 ? styles.halfImage : styles.fullImage}
+                      />
+                    ) : null
+                  )}
                 </View>
-              ))}
-          </Page>
+              </Page>
+            ))}
+
           {vedlegg
             .filter((v) => v.preview && !v.file.type.startsWith("image/"))
-            .map((v, idx) => (
-              <React.Fragment key={`doc-${idx}`}>
-                <Page size="A4" style={styles.page}>
-                  <Image src={v.preview!} style={styles.fullImage} />
+            .map((v, idx) =>
+              v.preview ? (
+                <Page key={`doc-${idx}`} size="A4" style={styles.page}>
+                  <Image src={v.preview} style={styles.fullImage} />
                 </Page>
-              </React.Fragment>
-            ))}
+              ) : null
+            )}
         </>
       )}
     </Document>

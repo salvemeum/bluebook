@@ -30,7 +30,6 @@ export default function DropdownLoyver({
   // Last inn biler.txt (liste over løyvenummer)
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}biler.txt`)
-
       .then((res) => res.text())
       .then((text) => {
         const lines = text
@@ -45,7 +44,6 @@ export default function DropdownLoyver({
   // Last inn sjoff.txt (ID + navn)
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}sjoff.txt`)
-
       .then((res) => res.text())
       .then((text) => {
         const lines = text
@@ -65,7 +63,7 @@ export default function DropdownLoyver({
     if (setFormData) {
       setFormData({
         ...(formData ?? {}),
-        loyver: next, // valgfri sync for kompatibilitet
+        loyver: next,
       });
     }
   }
@@ -93,7 +91,6 @@ export default function DropdownLoyver({
       return { ...s, [field]: value };
     });
 
-    // Lookup fra ID
     if (field === "sjoforId") {
       const hit = sjoff.find((s) => s.id === value);
       if (hit) {
@@ -105,7 +102,6 @@ export default function DropdownLoyver({
       }
     }
 
-    // Lookup fra Navn
     if (field === "sjoforNavn") {
       const formatted = capitalizeName(value);
       const hit = sjoff.find(
@@ -134,7 +130,6 @@ export default function DropdownLoyver({
     <section className="bb-section">
       <h2 className="font-bold mb-2">Løyver:</h2>
 
-      {/* Dropdown-knapp – OBLIGATORISK: rød når ingen valgt */}
       <div className="relative">
         <button
           type="button"
@@ -174,14 +169,12 @@ export default function DropdownLoyver({
         )}
       </div>
 
-      {/* Hjelpetekst når ingen valgt */}
       {noneSelected && (
         <p className="mt-2 text-sm text-red-600">
           Minst ett løyve er påkrevd.
         </p>
       )}
 
-      {/* Liste med valgte løyver */}
       <div className="mt-4 space-y-2">
         {loyver.map((item) => {
           const idEmpty = (item.sjoforId ?? "").trim().length === 0;
@@ -204,7 +197,7 @@ export default function DropdownLoyver({
                   onChange={(e) =>
                     updateLoyve(item.loyve, "sjoforId", e.target.value)
                   }
-                  className={`bb-input w-24 ${
+                  className={`bb-input w-[9ch] ${
                     idEmpty ? "bb-input--error" : ""
                   }`}
                   aria-invalid={idEmpty}
@@ -212,7 +205,7 @@ export default function DropdownLoyver({
               </label>
 
               {/* Navn input – OBLIGATORISK */}
-              <label className="flex flex-col gap-1 relative w-80 max-w-full">
+              <label className="flex flex-col gap-1 relative flex-1 min-w-[10rem] max-w-full">
                 <div className="flex items-center gap-2">
                   <span>Navn:</span>
                   <input
@@ -229,8 +222,6 @@ export default function DropdownLoyver({
                       setShowSuggest(true);
                     }}
                     onBlur={() => {
-                      // Lukk forslagslista når feltet mister fokus.
-                      // Delay så klikk på forslag rekker å trigge før blur lukker den.
                       setTimeout(() => {
                         setActiveSuggest(null);
                         setShowSuggest(false);
@@ -243,7 +234,6 @@ export default function DropdownLoyver({
                   />
                 </div>
 
-                {/* Autocomplete */}
                 {activeSuggest === item.loyve &&
                   showSuggest &&
                   (item.sjoforNavn ?? "").length > 1 && (
@@ -282,7 +272,6 @@ export default function DropdownLoyver({
                   )}
               </label>
 
-              {/* Fjern knapp */}
               <button
                 type="button"
                 onClick={() => toggleLoyve(item.loyve)}
